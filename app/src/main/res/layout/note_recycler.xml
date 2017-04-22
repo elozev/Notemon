@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.notemon.MainActivity">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/noteRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fabRecycler"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="@dimen/fab_margin"/>-->
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fabRecycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        fab:fab_addButtonColorNormal="@color/white"
+        fab:fab_addButtonColorPressed="@color/white_pressed"
+        fab:fab_addButtonPlusIconColor="@color/half_black"
+        fab:fab_labelStyle="@style/menu_labels_style">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addTextNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_short_text_white_24dp"
+            fab:fab_colorNormal="@android:color/holo_blue_dark"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Text Note"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addTodoList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_playlist_add_check_white_24dp"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Todo List"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addVoiceNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_voice_white_24dp"
+            fab:fab_colorNormal="@android:color/holo_red_dark"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Voice Note"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addMediaNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_perm_media_white_24dp"
+            fab:fab_colorNormal="@android:color/holo_green_dark"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Media Note"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+</android.support.design.widget.CoordinatorLayout>
