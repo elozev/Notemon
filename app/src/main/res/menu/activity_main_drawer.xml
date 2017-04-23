@@ -33,9 +33,9 @@
                 android:icon="@drawable/ic_person_black_24dp"
                 android:title="Profile"/>
             <item
-                android:id="@+id/navSetting"
+                android:id="@+id/navSettings"
                 android:icon="@drawable/ic_settings_black_24dp"
-                android:title="School"/>
+                android:title="Settings"/>
         </menu>
     </item>
 

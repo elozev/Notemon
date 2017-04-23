@@ -5,5 +5,5 @@ package com.notemon.models;
  */
 
 public enum Status {
-    TODO,DONE,DOING
+    TODO,DONE
 }
