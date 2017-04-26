@@ -14,12 +14,6 @@
         android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fabRecycler"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|end"-->
-    <!--android:layout_margin="@dimen/fab_margin"/>-->
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/fabRecycler"
@@ -29,9 +23,9 @@
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        fab:fab_addButtonColorNormal="@color/white"
-        fab:fab_addButtonColorPressed="@color/white_pressed"
-        fab:fab_addButtonPlusIconColor="@color/half_black"
+        fab:fab_addButtonColorNormal="@color/colorAccent"
+        fab:fab_addButtonColorPressed="@color/colorAccent"
+        fab:fab_addButtonPlusIconColor="@color/white"
         fab:fab_labelStyle="@style/menu_labels_style">
 
         <com.getbase.floatingactionbutton.FloatingActionButton

@@ -1,10 +1,9 @@
 package com.notemon;
 
 import android.app.FragmentManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,41 +12,40 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.notemon.fragments.NoteRecyclerFragment;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
+
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-        setupHomeFragment();
-    }
-
-    private void setupHomeFragment(){
-        FragmentManager manager = getFragmentManager();
-
-        NoteRecyclerFragment fragment = new NoteRecyclerFragment();
-
-        manager.beginTransaction()
-                .replace(R.id.mainFrameLayout, fragment)
-                .commit();
+        setupFrontFragment(true, 0, 0, 0);
     }
 
     @Override
@@ -90,9 +88,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.navHome:
-                setupHomeFragment();
+                setupFrontFragment(true, 0,0,0);
+                break;
+            case R.id.navProject:
+                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
                 break;
         }
 
@@ -114,4 +115,47 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void setupFrontFragment(boolean isHome, long projectID, int projectColor, int projectColorDark) {
+        FragmentManager manager = getFragmentManager();
+
+        NoteRecyclerFragment fragment = new NoteRecyclerFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(Constants.HOME_FRAGMENT, isHome);
+        args.putLong(Constants.PROJECT_ID, projectID);
+        fragment.setArguments(args);
+        manager.beginTransaction()
+                .replace(R.id.mainFrameLayout, fragment)
+                .commit();
+
+        if (isHome) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.home_color));
+            toolbar.setTitleTextColor(getResources().getColor(R.color.black));
+            toolbar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setToolbarColor(getResources().getColor(R.color.home_color_dark));
+            }
+
+        } else {
+            toolbar.setBackgroundColor(projectColor);
+            toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+            toolbar.setSystemUiVisibility(0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setToolbarColor(projectColorDark);
+            }
+
+        }
+
+    }
+
+    private void setToolbarColor(int resColor) {
+        Window window = this.getWindow();
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(resColor);
+        }
+    }
+
 }

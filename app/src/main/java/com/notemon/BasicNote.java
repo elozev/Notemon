@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +28,8 @@ public class BasicNote extends AppCompatActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.toolbarTitle)
-    TextView toolbarTitle;
+    String title;
+    String content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,28 +41,20 @@ public class BasicNote extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         String noteType = getIntent().getStringExtra(Constants.NOTE_TYPE);
-        replaceFragment(Constants.NOTE_TODO);
 
+        title = getIntent().getStringExtra("note_title");
+        content = getIntent().getStringExtra("note_content");
 
-//        actionBar
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        replaceFragment(noteType);
     }
 
-    @OnClick(R.id.toolbarTitle)
-    public void titleClick(){
-        Toast.makeText(this, "Edit me", Toast.LENGTH_SHORT).show();
-    }
-
+//    @OnClick(R.id.toolbarTitle)
+//    public void titleClick(){
+//        Toast.makeText(this, "Edit me", Toast.LENGTH_SHORT).show();
+//    }
+//
 
     //TODO: replace with the title of the note and send the needed objects
     private void replaceFragment(String noteType) {
@@ -69,9 +63,12 @@ public class BasicNote extends AppCompatActivity {
 
         switch (noteType){
             case Constants.NOTE_TEXT:
-                toolbar.setTitle("Text Note");
+                toolbar.setTitle(title);
 
                 TextNoteFragment textNoteFragment = new TextNoteFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("note_content", content);
+                textNoteFragment.setArguments(bundle);
 
                 manager.beginTransaction()
                         .replace(R.id.basicNoteFrameLayout, textNoteFragment)
@@ -106,4 +103,10 @@ public class BasicNote extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.note_menu, menu);
+        return true;
+    }
 }

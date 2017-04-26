@@ -25,27 +25,32 @@ import butterknife.OnClick;
 public class TextNoteFragment extends Fragment {
 
     @BindView(R.id.textNoteText)
-    TextView text;
+    TextView textView;
 
     private String editedText = "";
+    private String content;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.note_text, container, false);
         ButterKnife.bind(this, view);
+
+        content = getArguments().getString("note_content");
+        textView.setText(content);
+
         return view;
     }
 
 
     @OnClick(R.id.textNoteText)
     public void textClick(){
-        Toast.makeText(getActivity(), "Edit text", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Edit textView", Toast.LENGTH_SHORT).show();
 
 
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.edit)
-                .input(null, text.getText().toString(), new MaterialDialog.InputCallback() {
+                .input(null, textView.getText().toString(), new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         editedText = input.toString();
@@ -58,8 +63,8 @@ public class TextNoteFragment extends Fragment {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        Toast.makeText(getActivity(), "text: " + editedText, Toast.LENGTH_SHORT).show();
-                        text.setText(editedText);
+                        Toast.makeText(getActivity(), "textView: " + editedText, Toast.LENGTH_SHORT).show();
+                        textView.setText(editedText);
                         sendUpdateToAPI();
                     }
                 })
