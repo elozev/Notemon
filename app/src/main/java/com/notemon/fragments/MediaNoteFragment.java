@@ -7,11 +7,13 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.notemon.Constants;
@@ -28,6 +30,9 @@ import butterknife.OnClick;
 
 public class MediaNoteFragment extends Fragment {
 
+    @BindView(R.id.mediaNoteTextView)
+    TextView textView;
+
     @BindView(R.id.mediaNoteImageView)
     ImageView imageView;
 
@@ -41,6 +46,8 @@ public class MediaNoteFragment extends Fragment {
 
         url = getArguments().getString(Constants.NOTE_MEDIA_URL);
         Picasso.with(getActivity()).load(url).into(imageView);
+
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
         return view;
     }

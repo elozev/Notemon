@@ -5,6 +5,8 @@ package com.notemon.models;
  */
 
 public class TodoTask {
+
+
     private String content;
     private Status status;
     private int order;
