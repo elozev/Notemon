@@ -51,8 +51,8 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
         if (content != null) {
             textView.setText(content);
             checkHasItLink(content);
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
-        }
         return view;
     }
 
@@ -74,6 +74,7 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
     @OnClick(R.id.textNoteText)
     public void textClick() {
         Toast.makeText(getActivity(), "Edit textView", Toast.LENGTH_SHORT).show();
+
 
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.edit)
@@ -98,6 +99,7 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
                 .negativeText("Cancel")
                 .show();
     }
+
 
     //TODO
     private void sendUpdateToAPI() {
