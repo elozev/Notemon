@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -33,8 +34,18 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int FILE = 0;
+    private static final int EDIT = 1;
+    private static final int NEW_MENU_ITEM = Menu.FIRST;
+    private static final int SAVE_MENU_ITEM = NEW_MENU_ITEM + 1;
+    private static final int UNDO_MENU_ITEM = SAVE_MENU_ITEM + 1;
+    private static final int REDO_MENU_ITEM = UNDO_MENU_ITEM + 1;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +66,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setupFrontFragment(true, 0, 0, 0);
+
+
+
     }
 
     @Override
@@ -71,7 +85,15 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
+
+        SubMenu fileMenu = menu.addSubMenu("File");
+        SubMenu editMenu = menu.addSubMenu("Edit");
+        fileMenu.add(FILE, NEW_MENU_ITEM, 0, "new");
+        fileMenu.add(FILE, SAVE_MENU_ITEM, 1, "save");
+        editMenu.add(EDIT, UNDO_MENU_ITEM, 0, "undo");
+        editMenu.add(EDIT, REDO_MENU_ITEM, 1, "redo");
         getMenuInflater().inflate(R.menu.main, menu);
+
         return true;
     }
 
@@ -101,9 +123,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.navHome:
                 setupFrontFragment(true, 0,0,0);
                 break;
-            case R.id.navProject:
-                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
-                break;
+//            case R.id.navProject:
+//                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
+//                break;
         }
 
 //        if (id == R.id.nav_camera) {
@@ -166,6 +188,7 @@ public class MainActivity extends AppCompatActivity
             window.setStatusBarColor(resColor);
         }
     }
+
 
 
 

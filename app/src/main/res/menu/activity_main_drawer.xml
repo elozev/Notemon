@@ -13,18 +13,6 @@
 
     </group>
 
-    <item android:title="Projects">
-        <menu>
-            <item
-                android:id="@+id/navProject"
-                android:icon="@drawable/ic_play_arrow_black_24dp"
-                android:title="Project Home"/>
-            <item
-                android:id="@+id/navProject2"
-                android:icon="@drawable/ic_play_arrow_black_24dp"
-                android:title="School"/>
-        </menu>
-    </item>
 
     <item android:title="Utils">
         <menu>
@@ -38,5 +26,19 @@
                 android:title="Settings"/>
         </menu>
     </item>
+
+
+    <!--<item android:title="Projects">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/navProject"-->
+                <!--android:icon="@drawable/ic_play_arrow_black_24dp"-->
+                <!--android:title="Project Home"/>-->
+            <!--<item-->
+                <!--android:id="@+id/navProject2"-->
+                <!--android:icon="@drawable/ic_play_arrow_black_24dp"-->
+                <!--android:title="School"/>-->
+        <!--</menu>-->
+    <!--</item>-->
 
 </menu>
