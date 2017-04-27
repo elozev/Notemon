@@ -140,9 +140,10 @@ public class NoteRecyclerFragment extends Fragment {
         new MaterialDialog.Builder(getActivity())
                 .title("Enter content:")
                 .inputRangeRes(1, 200, R.color.project_red)
+                .alwaysCallInputCallback()
                 .input(getString(R.string.content), null, new MaterialDialog.InputCallback() {
                     @Override
-                    public void onInput(MaterialDialog dialog3, CharSequence input3) {
+                    public void onInput(@NonNull MaterialDialog dialog3, @NonNull CharSequence input3) {
                         noteContent = input3.toString();
                         Log.d(TAG, "Values are here: " + input3.toString());
 

@@ -12,7 +12,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.freesoulapps.preview.android.Preview;
 import com.notemon.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,10 +26,13 @@ import butterknife.OnClick;
  * Created by emil on 22.04.17.
  */
 
-public class TextNoteFragment extends Fragment {
+public class TextNoteFragment extends Fragment implements Preview.PreviewListener {
 
     @BindView(R.id.textNoteText)
     TextView textView;
+
+    @BindView(R.id.preview)
+    Preview preview;
 
     private String editedText = "";
     private String content;
@@ -36,17 +43,37 @@ public class TextNoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.note_text, container, false);
         ButterKnife.bind(this, view);
 
-        content = getArguments().getString("note_content");
-        textView.setText(content);
+//        preview = (Preview) view.findViewById(R.id.preview);
+        preview.setListener(this);
+        preview.setVisibility(View.INVISIBLE);
 
+        content = getArguments().getString("note_content");
+        if (content != null) {
+            textView.setText(content);
+            checkHasItLink(content);
+
+        }
         return view;
     }
 
+    private void checkHasItLink(String content) {
+        if (content.contains("http") || content.contains("www")) {
+            String[] splitContent = content.split(" ");
+            List<String> links = new ArrayList<>();
+
+            for (String str : splitContent) {
+                if (str.contains("http") || str.contains("www")) {
+                    links.add(str);
+                }
+            }
+            preview.setVisibility(View.VISIBLE);
+            preview.setData(links.get(0));
+        }
+    }
 
     @OnClick(R.id.textNoteText)
-    public void textClick(){
+    public void textClick() {
         Toast.makeText(getActivity(), "Edit textView", Toast.LENGTH_SHORT).show();
-
 
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.edit)
@@ -72,9 +99,12 @@ public class TextNoteFragment extends Fragment {
                 .show();
     }
 
-
     //TODO
     private void sendUpdateToAPI() {
     }
 
+    @Override
+    public void onDataReady(Preview preview) {
+        this.preview.setMessage(preview.getLink());
+    }
 }

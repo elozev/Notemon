@@ -129,12 +129,12 @@ public class MainActivity extends AppCompatActivity
                 .commit();
 
         if (isHome) {
-            toolbar.setBackgroundColor(getResources().getColor(R.color.home_color));
-            toolbar.setTitleTextColor(getResources().getColor(R.color.black));
-            toolbar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+//            toolbar.setTitleTextColor(getResources().getColor(R.color.black));
+//            toolbar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                setToolbarColor(getResources().getColor(R.color.home_color_dark));
+                setToolbarColor(getResources().getColor(R.color.colorPrimaryDark));
             }
 
         } else {

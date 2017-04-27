@@ -50,11 +50,6 @@ public class BasicNote extends AppCompatActivity {
         replaceFragment(noteType);
     }
 
-//    @OnClick(R.id.toolbarTitle)
-//    public void titleClick(){
-//        Toast.makeText(this, "Edit me", Toast.LENGTH_SHORT).show();
-//    }
-//
 
     //TODO: replace with the title of the note and send the needed objects
     private void replaceFragment(String noteType) {
