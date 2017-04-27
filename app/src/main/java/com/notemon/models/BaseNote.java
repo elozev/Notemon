@@ -12,6 +12,13 @@ public class BaseNote {
     private String title;
     private Date reminder;
     private Date createdAt;
+    private int type;
+
+    public BaseNote(String title, int type) {
+        this.title = title;
+        this.type = type;
+    }
+
 
 
     public String getTitle() {
@@ -44,5 +51,13 @@ public class BaseNote {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

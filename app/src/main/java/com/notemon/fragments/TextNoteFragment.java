@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,8 +52,9 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
         if (content != null) {
             textView.setText(content);
             checkHasItLink(content);
-        textView.setMovementMethod(new ScrollingMovementMethod());
+            textView.setMovementMethod(new ScrollingMovementMethod());
 
+        }
         return view;
     }
 
@@ -74,7 +76,6 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
     @OnClick(R.id.textNoteText)
     public void textClick() {
         Toast.makeText(getActivity(), "Edit textView", Toast.LENGTH_SHORT).show();
-
 
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.edit)
@@ -99,7 +100,6 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
                 .negativeText("Cancel")
                 .show();
     }
-
 
     //TODO
     private void sendUpdateToAPI() {

@@ -13,4 +13,8 @@ public interface Constants {
     String NOTE_MEDIA_URL = "note_url";
     String HOME_FRAGMENT = "home_fragment";
     String PROJECT_ID = "project_id";
+
+    int NOTE_TYPE_TEXT = 0;
+    int NOTE_TYPE_MEDIA= 1;
+    int NOTE_TYPE_TODO = 2;
 }

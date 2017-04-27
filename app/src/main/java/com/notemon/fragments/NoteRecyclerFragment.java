@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +21,16 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.notemon.BasicNote;
 import com.notemon.Constants;
 import com.notemon.R;
+import com.notemon.adapters.NotesRecyclerAdapter;
+import com.notemon.models.BaseNote;
+import com.notemon.models.MediaNote;
+import com.notemon.models.Status;
+import com.notemon.models.TextNote;
+import com.notemon.models.TodoNote;
+import com.notemon.models.TodoTask;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +59,15 @@ public class NoteRecyclerFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+        setUpRecycler();
         return view;
+    }
+
+    private void setUpRecycler() {
+        NotesRecyclerAdapter adapter = new NotesRecyclerAdapter(testListForRecycler(), getActivity());
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
+        noteRecycler.setLayoutManager(manager);
+        noteRecycler.setAdapter(adapter);
     }
 
     @OnClick(R.id.addMediaNote)
@@ -123,16 +140,16 @@ public class NoteRecyclerFragment extends Fragment {
                         noteTitle = input.toString();
                     }
                 }).onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        if (isVoiceNote)
-                            createVoiceNote();
-                        else {
-                            dialog.dismiss();
-                            dialogNoteContent();
-                        }
-                    }
-                })
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                if (isVoiceNote)
+                    createVoiceNote();
+                else {
+                    dialog.dismiss();
+                    dialogNoteContent();
+                }
+            }
+        })
                 .show();
     }
 
@@ -149,13 +166,13 @@ public class NoteRecyclerFragment extends Fragment {
 
                     }
                 }).onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        Toast.makeText(getActivity(), noteContent, Toast.LENGTH_SHORT).show();
-                        createTextNote(noteTitle, noteContent);
-                    }
-                })
+                Toast.makeText(getActivity(), noteContent, Toast.LENGTH_SHORT).show();
+                createTextNote(noteTitle, noteContent);
+            }
+        })
                 .show();
     }
 
@@ -168,5 +185,34 @@ public class NoteRecyclerFragment extends Fragment {
         intent.putExtra("note_title", noteTitle);
         intent.putExtra("note_content", content);
         startActivity(intent);
+    }
+
+    private List<BaseNote> testListForRecycler() {
+        List<BaseNote> notes = new ArrayList<>();
+
+        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, "Content 1"));
+        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, "Content 2"));
+
+        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, "Some media text 1", "http://kingofwallpapers.com/picture/picture-010.jpg"));
+        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, "Some media text 2", "http://kingofwallpapers.com/picture/picture-010.jpg"));
+
+        List<TodoTask> tasks = new ArrayList<>();
+
+        tasks.add(new TodoTask("1", Status.DONE, 1));
+        tasks.add(new TodoTask("2", Status.DONE, 1));
+        tasks.add(new TodoTask("3", Status.TODO, 1));
+        tasks.add(new TodoTask("4", Status.DONE, 1));
+        tasks.add(new TodoTask("5", Status.TODO, 1));
+        tasks.add(new TodoTask("7", Status.TODO, 1));
+        tasks.add(new TodoTask("8", Status.TODO, 1));
+        tasks.add(new TodoTask("9", Status.DONE, 1));
+
+        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
+        notes.add(new TodoNote("Title todo 2", Constants.NOTE_TYPE_TODO, tasks));
+
+        for (BaseNote note : notes) {
+            Log.d(TAG, "Note type:" + note.getType());
+        }
+        return notes;
     }
 }

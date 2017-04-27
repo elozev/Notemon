@@ -8,6 +8,11 @@ public class MediaNote extends TextNote {
 
     private String mediaUrl;
 
+    public MediaNote(String title, int type, String content, String mediaUrl) {
+        super(title, type, content);
+        this.mediaUrl = mediaUrl;
+    }
+
     public String getMediaUrl() {
         return mediaUrl;
     }

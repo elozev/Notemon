@@ -10,6 +10,11 @@ public class TodoNote extends BaseNote {
 
     private List<TodoTask> tasks;
 
+    public TodoNote(String title, int type, List<TodoTask> tasks) {
+        super(title, type);
+        this.tasks = tasks;
+    }
+
     public List<TodoTask> getTasks() {
         return tasks;
     }

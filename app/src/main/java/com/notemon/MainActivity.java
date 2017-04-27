@@ -17,6 +17,15 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.notemon.fragments.NoteRecyclerFragment;
+import com.notemon.models.BaseNote;
+import com.notemon.models.MediaNote;
+import com.notemon.models.Status;
+import com.notemon.models.TextNote;
+import com.notemon.models.TodoNote;
+import com.notemon.models.TodoTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -157,5 +166,7 @@ public class MainActivity extends AppCompatActivity
             window.setStatusBarColor(resColor);
         }
     }
+
+
 
 }

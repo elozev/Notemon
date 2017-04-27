@@ -8,6 +8,12 @@ public class TextNote extends BaseNote {
 
     private String content;
 
+    public TextNote(String title, int type, String content) {
+        super(title, type);
+        this.content = content;
+    }
+
+
     public String getContent() {
         return content;
     }
