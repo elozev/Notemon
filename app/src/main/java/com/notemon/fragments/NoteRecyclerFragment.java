@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -66,7 +67,7 @@ public class NoteRecyclerFragment extends Fragment {
     private void setUpRecycler() {
         NotesRecyclerAdapter adapter = new NotesRecyclerAdapter(testListForRecycler(), getActivity());
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
-        noteRecycler.setLayoutManager(manager);
+        noteRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         noteRecycler.setAdapter(adapter);
     }
 
@@ -189,13 +190,6 @@ public class NoteRecyclerFragment extends Fragment {
 
     private List<BaseNote> testListForRecycler() {
         List<BaseNote> notes = new ArrayList<>();
-
-        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, "Content 1"));
-        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, "Content 2"));
-
-        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, "Some media text 1", "http://kingofwallpapers.com/picture/picture-010.jpg"));
-        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, "Some media text 2", "http://kingofwallpapers.com/picture/picture-010.jpg"));
-
         List<TodoTask> tasks = new ArrayList<>();
 
         tasks.add(new TodoTask("1", Status.DONE, 1));
@@ -207,8 +201,13 @@ public class NoteRecyclerFragment extends Fragment {
         tasks.add(new TodoTask("8", Status.TODO, 1));
         tasks.add(new TodoTask("9", Status.DONE, 1));
 
-        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
+
+        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
+        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
+        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
         notes.add(new TodoNote("Title todo 2", Constants.NOTE_TYPE_TODO, tasks));
+        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
+        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
 
         for (BaseNote note : notes) {
             Log.d(TAG, "Note type:" + note.getType());

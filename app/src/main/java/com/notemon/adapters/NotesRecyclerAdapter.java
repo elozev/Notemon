@@ -41,10 +41,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public NotesRecyclerAdapter(List<BaseNote> notes, Context context) {
         this.notes = notes;
         this.context = context;
-
-//        for(BaseNote note: notes){
-//            Log.d(TAG, "Note type:" + note.getType());
-//        }
     }
 
     @Override
@@ -107,7 +103,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemViewType(int position) {
-        notes.get(position);
         return notes.get(position).getType();
     }
 
