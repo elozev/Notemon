@@ -21,9 +21,12 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.notemon.fragments.NoteRecyclerFragment;
+import com.notemon.models.Project;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,15 +40,16 @@ public class MainActivity extends AppCompatActivity
     private static final int SAVE_MENU_ITEM = NEW_MENU_ITEM + 1;
     private static final int UNDO_MENU_ITEM = SAVE_MENU_ITEM + 1;
     private static final int REDO_MENU_ITEM = UNDO_MENU_ITEM + 1;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private SubMenu projectSubMenu;
     private Menu navMenu;
+    private Map<Integer, Project> projectMap;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +73,9 @@ public class MainActivity extends AppCompatActivity
         projectSubMenu = navMenu.addSubMenu(R.string.projects);
         projectSubMenu.add(0, Menu.FIRST, Menu.FIRST, R.string.add_project)
                 .setIcon(R.drawable.ic_add_black_24dp);
-        projectSubMenu.add(1, Menu.FIRST + 1, Menu.FIRST, "Second Title")
-                .setIcon(R.drawable.ic_flag_black_24dp);
+        setupFrontFragment(true, 0, 0, 0, null);
 
-        setupFrontFragment(true, 0, 0, 0);
-
-
+        fakeProjects();
     }
 
     @Override
@@ -89,23 +90,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-
-        SubMenu fileMenu = menu.addSubMenu("File");
-        SubMenu editMenu = menu.addSubMenu("Edit");
-
-        fileMenu.add(FILE, NEW_MENU_ITEM, 0, "new");
-        fileMenu.add(FILE, SAVE_MENU_ITEM, 1, "save");
-        fileMenu.setGroupVisible(FILE, true);
-
-        editMenu.add(EDIT, UNDO_MENU_ITEM, 0, "undo");
-        editMenu.add(EDIT, REDO_MENU_ITEM, 1, "redo");
-        editMenu.setGroupVisible(EDIT, false);
-
-
         getMenuInflater().inflate(R.menu.main, menu);
-
         return true;
     }
 
@@ -135,10 +120,20 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Adding Project", Toast.LENGTH_SHORT).show();
             createProject();
         }
+// else if(id == projectSubMenu.getItem(1).getItemId()){
+//            Toast.makeText(this, "First Project", Toast.LENGTH_SHORT).show();
+//        }
+
+        for (Map.Entry<Integer, Project> entry : projectMap.entrySet()) {
+            if (id == projectSubMenu.getItem(entry.getKey()).getItemId()) {
+                Toast.makeText(this, "Project" + entry.getKey(), Toast.LENGTH_SHORT).show();
+                setupFrontFragment(false, entry.getKey(), entry.getValue().getColor(), entry.getValue().getColorDark(), entry.getValue());
+            }
+        }
 
         switch (id) {
             case R.id.navHome:
-                setupFrontFragment(true, 0, 0, 0);
+                setupFrontFragment(true, 0, 0, 0, null);
                 break;
 //            case R.id.navProject:
 //                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
@@ -166,13 +161,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setupFrontFragment(boolean isHome, long projectID, int projectColor, int projectColorDark) {
+    private void setupFrontFragment(boolean isHome, long projectID, int projectColor, int projectColorDark, Project project) {
         FragmentManager manager = getFragmentManager();
 
         NoteRecyclerFragment fragment = new NoteRecyclerFragment();
         Bundle args = new Bundle();
         args.putBoolean(Constants.HOME_FRAGMENT, isHome);
         args.putLong(Constants.PROJECT_ID, projectID);
+        args.putSerializable(Constants.PROJECT_ALL, project);
         fragment.setArguments(args);
         manager.beginTransaction()
                 .replace(R.id.mainFrameLayout, fragment)
@@ -180,6 +176,7 @@ public class MainActivity extends AppCompatActivity
 
         if (isHome) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            toolbar.setTitle(R.string.notemon_title);
 //            toolbar.setTitleTextColor(getResources().getColor(R.color.black));
 //            toolbar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
@@ -188,11 +185,13 @@ public class MainActivity extends AppCompatActivity
             }
 
         } else {
-            toolbar.setBackgroundColor(projectColor);
+//            Log.d(TAG, projectColor + ": lainoooooo");
+            toolbar.setBackgroundColor(project.getColor());
+            toolbar.setTitle(project.getName());
             toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-            toolbar.setSystemUiVisibility(0);
+//            toolbar.setSystemUiVisibility(0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                setToolbarColor(projectColorDark);
+                setToolbarColor(project.getColorDark());
             }
 
         }
@@ -209,11 +208,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String projectNameAdd = "";
+    private String projectColorAdd = "";
 
     private void createProject() {
 
-
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
+        new MaterialDialog.Builder(this)
                 .title(getString(R.string.add_project))
                 .input("Project Name", null, new MaterialDialog.InputCallback() {
                     @Override
@@ -229,11 +228,10 @@ public class MainActivity extends AppCompatActivity
                         colorDialog(projectNameAdd);
                     }
                 })
-//
-            .show();
+                .show();
     }
 
-    private void colorDialog(String projectName){
+    private void colorDialog(String projectName) {
         final List<String> colorList = new ArrayList<>();
 
         colorList.add("red");
@@ -246,25 +244,39 @@ public class MainActivity extends AppCompatActivity
         colorList.add("orange");
         colorList.add("lime");
 
-
         new MaterialDialog.Builder(this)
                 .title(getString(R.string.add_project))
                 .items(colorList).itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-                    @Override
-                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        Toast.makeText(MainActivity.this, colorList.get(which), Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        Toast.makeText(MainActivity.this, "Creating project:" + projectNameAdd, Toast.LENGTH_SHORT).show();
-                    }
-                })
+            @Override
+            public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                Toast.makeText(MainActivity.this, colorList.get(which), Toast.LENGTH_SHORT).show();
+                projectColorAdd = colorList.get(which);
+                return true;
+            }
+        })
                 .show();
 
+        //TODO: call api here
 
+    }
+
+    private void fakeProjects() {
+        projectMap = new HashMap<>();
+        projectMap.put(1, new Project("yellow", getResources().getColor(R.color.project_blue), getResources().getColor(R.color.project_blue_dark), "Project 1", "lalla"));
+        projectMap.put(2, new Project("yellow", getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark), "Project 2", "lalla"));
+        projectMap.put(3, new Project("yellow", getResources().getColor(R.color.project_cyan), getResources().getColor(R.color.project_cyan_dark), "Project 3", "lalla"));
+        projectMap.put(4, new Project("yellow", getResources().getColor(R.color.project_green), getResources().getColor(R.color.project_green_dark), "Project 4", "lalla"));
+        projectMap.put(5, new Project("yellow", getResources().getColor(R.color.project_purple), getResources().getColor(R.color.project_purple_dark), "Project 5", "lalla"));
+
+        addProjectsToNav(projectMap);
+
+    }
+
+    private void addProjectsToNav(Map<Integer, Project> projects) {
+        for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
+            projectSubMenu.add(1, entry.getKey() + 1, entry.getKey(), entry.getValue().getName())
+                    .setIcon(R.drawable.ic_flag_black_24dp);
+        }
     }
 
 }

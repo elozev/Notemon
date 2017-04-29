@@ -1,19 +1,23 @@
 package com.notemon.models;
 
+import java.io.Serializable;
+
 /**
  * Created by emil on 4/28/17.
  */
 
-public class Project {
+public class Project implements Serializable {
     private Long id;
     private int color;
+    private int colorDark;
     private String colorName;
     private String name;
     private String description;
 
-    public Project(String colorName, int color, String name, String description) {
+    public Project(String colorName, int color, int colorDark, String name, String description) {
         this.colorName = colorName;
         this.color = color;
+        this.colorDark = colorDark;
         this.name = name;
         this.description = description;
     }
@@ -56,5 +60,13 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getColorDark() {
+        return colorDark;
+    }
+
+    public void setColorDark(int colorDark) {
+        this.colorDark = colorDark;
     }
 }
