@@ -16,8 +16,45 @@
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
     <color name="home_color">#FAFAFA</color>
     <color name="home_color_dark">#EEEEEE</color>
-    <color name="project_red_dark">#C62828</color>
-    <color name="project_red">#E53935</color>
     <color name="black">#000000</color>
     <color name="divider">#616161</color>
+
+
+
+    <color name="project_red">#E53935</color>
+    <color name="project_red_dark">#C62828</color>
+
+    <color name="project_blue">#42A5F5</color>
+    <color name="project_blue_dark">#1E88E5</color>
+
+    <color name="project_green">#66BB6A</color>
+    <color name="project_green_dark">#43A047</color>
+
+
+    <color name="project_yellow">#FFEE58</color>
+    <color name="project_yellow_dark">#FDD835</color>
+
+
+    <color name="project_pink">#EC407A</color>
+    <color name="project_pink_dark">#D81B60</color>
+
+
+    <color name="project_purple">#AB47BC</color>
+    <color name="project_purple_dark">#8E24AA</color>
+
+
+    <color name="project_cyan">#26C6DA</color>
+    <color name="project_cyan_dark">#00ACC1</color>
+
+
+    <color name="project_teal">#26A69A</color>
+    <color name="project_teal_dark">#00897B</color>
+
+
+    <color name="project_lime">#D4E157</color>
+    <color name="project_lime_dark">#C0CA33</color>
+
+    <color name="project_orange">#FFA726</color>
+    <color name="project_orange_dark">#FB8C00</color>
+
 </resources>

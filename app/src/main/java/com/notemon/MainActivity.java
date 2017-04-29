@@ -3,7 +3,7 @@ package com.notemon;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,14 +16,11 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.notemon.fragments.NoteRecyclerFragment;
-import com.notemon.models.BaseNote;
-import com.notemon.models.MediaNote;
-import com.notemon.models.Status;
-import com.notemon.models.TextNote;
-import com.notemon.models.TodoNote;
-import com.notemon.models.TodoTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +37,15 @@ public class MainActivity extends AppCompatActivity
     private static final int SAVE_MENU_ITEM = NEW_MENU_ITEM + 1;
     private static final int UNDO_MENU_ITEM = SAVE_MENU_ITEM + 1;
     private static final int REDO_MENU_ITEM = UNDO_MENU_ITEM + 1;
+    private SubMenu projectSubMenu;
+    private Menu navMenu;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +62,17 @@ public class MainActivity extends AppCompatActivity
 
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setupFrontFragment(true, 0, 0, 0);
+        navMenu = navigationView.getMenu();
+        projectSubMenu = navMenu.addSubMenu(R.string.projects);
+        projectSubMenu.add(0, Menu.FIRST, Menu.FIRST, R.string.add_project)
+                .setIcon(R.drawable.ic_add_black_24dp);
+        projectSubMenu.add(1, Menu.FIRST + 1, Menu.FIRST, "Second Title")
+                .setIcon(R.drawable.ic_flag_black_24dp);
 
+        setupFrontFragment(true, 0, 0, 0);
 
 
     }
@@ -88,10 +94,16 @@ public class MainActivity extends AppCompatActivity
 
         SubMenu fileMenu = menu.addSubMenu("File");
         SubMenu editMenu = menu.addSubMenu("Edit");
+
         fileMenu.add(FILE, NEW_MENU_ITEM, 0, "new");
         fileMenu.add(FILE, SAVE_MENU_ITEM, 1, "save");
+        fileMenu.setGroupVisible(FILE, true);
+
         editMenu.add(EDIT, UNDO_MENU_ITEM, 0, "undo");
         editMenu.add(EDIT, REDO_MENU_ITEM, 1, "redo");
+        editMenu.setGroupVisible(EDIT, false);
+
+
         getMenuInflater().inflate(R.menu.main, menu);
 
         return true;
@@ -119,12 +131,19 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        if (id == projectSubMenu.getItem(0).getItemId()) {
+            Toast.makeText(this, "Adding Project", Toast.LENGTH_SHORT).show();
+            createProject();
+        }
+
         switch (id) {
             case R.id.navHome:
-                setupFrontFragment(true, 0,0,0);
+                setupFrontFragment(true, 0, 0, 0);
                 break;
 //            case R.id.navProject:
 //                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
+//                break;
+//            case projectSubMenu.getItem(Menu.FIRST).getItemId():
 //                break;
         }
 
@@ -189,7 +208,63 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private String projectNameAdd = "";
+
+    private void createProject() {
 
 
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title(getString(R.string.add_project))
+                .input("Project Name", null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        projectNameAdd = input.toString();
+                    }
+                })
+                .alwaysCallInputCallback()
+                .content("Choose Project Name")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        colorDialog(projectNameAdd);
+                    }
+                })
+//
+            .show();
+    }
+
+    private void colorDialog(String projectName){
+        final List<String> colorList = new ArrayList<>();
+
+        colorList.add("red");
+        colorList.add("blue");
+        colorList.add("green");
+        colorList.add("yellow");
+        colorList.add("pink");
+        colorList.add("purple");
+        colorList.add("teal");
+        colorList.add("orange");
+        colorList.add("lime");
+
+
+        new MaterialDialog.Builder(this)
+                .title(getString(R.string.add_project))
+                .items(colorList).itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        Toast.makeText(MainActivity.this, colorList.get(which), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Toast.makeText(MainActivity.this, "Creating project:" + projectNameAdd, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+
+
+    }
 
 }
