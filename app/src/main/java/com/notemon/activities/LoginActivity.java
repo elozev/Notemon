@@ -21,6 +21,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,10 +32,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.notemon.R;
+import com.notemon.helpers.Constants;
+import com.notemon.models.TextNote;
 import com.notemon.models.User;
 import com.notemon.rest.RestMethods;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,8 +113,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         setUpSignUpSpan();
+
+        jsonFactory();
     }
 
+    void jsonFactory(){
+        ObjectMapper mapper = new ObjectMapper();
+        TextNote note = new TextNote("Title", Constants.NOTE_TYPE_TEXT, "contetn");
+
+        try {
+            String s = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(note);
+            Log.d("JSON", "JSON: " + s);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @OnClick(R.id.signUpTextView)
     public void signUpClick(){
@@ -216,7 +237,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void callAuthentication(User user) {
-        RestMethods.loginUser(user, LoginActivity.this);
+        RestMethods.loginUser(user, LoginActivity.this, false);
     }
 
     private boolean isEmailValid(String email) {

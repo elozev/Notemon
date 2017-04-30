@@ -10,29 +10,20 @@ public class Project implements Serializable {
     private Long id;
     private int color;
     private int colorDark;
-    private String colorName;
     private String name;
-    private String description;
 
-    public Project(String colorName, int color, int colorDark, String name, String description) {
-        this.colorName = colorName;
+    public Project(int color, int colorDark, String name) {
         this.color = color;
         this.colorDark = colorDark;
         this.name = name;
-        this.description = description;
     }
+
+    public Project(){}
 
     public Long getId() {
         return id;
     }
 
-    public String getColorName() {
-        return colorName;
-    }
-
-    public void setColorName(String colorName) {
-        this.colorName = colorName;
-    }
 
     public void setId(Long id) {
         this.id = id;
@@ -52,14 +43,6 @@ public class Project implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public int getColorDark() {

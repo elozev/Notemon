@@ -12,11 +12,13 @@ public class BaseNote {
     private String title;
     private Date reminder;
     private Date createdAt;
+    private String content;
     private int type;
 
-    public BaseNote(String title, int type) {
+    public BaseNote(String title, int type, String content) {
         this.title = title;
         this.type = type;
+        this.content = content;
     }
 
 
@@ -59,5 +61,13 @@ public class BaseNote {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getTextNoteContent() {
+        return content;
+    }
+
+    public void setTextNoteContent(String textNoteContent) {
+        this.content = textNoteContent;
     }
 }

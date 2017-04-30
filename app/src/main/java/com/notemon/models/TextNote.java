@@ -6,19 +6,24 @@ package com.notemon.models;
 
 public class TextNote extends BaseNote {
 
-    private String content;
+    private String textNoteContent;
 
     public TextNote(String title, int type, String content) {
-        super(title, type);
-        this.content = content;
+        super(title, type, content);
+        this.textNoteContent = content;
     }
 
 
-    public String getContent() {
-        return content;
+    public String getTextNoteContent() {
+        return textNoteContent;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setTextNoteContent(String textNoteContent) {
+        this.textNoteContent = textNoteContent;
+    }
+
+    @Override
+    public String toString() {
+        return textNoteContent;
     }
 }

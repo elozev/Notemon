@@ -2,7 +2,6 @@ package com.notemon.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +19,7 @@ import com.notemon.models.TodoTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,14 +63,14 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
 
                 textNoteHolder.title.setText(textNote.getTitle());
-                textNoteHolder.content.setText(textNote.getContent());
+                textNoteHolder.content.setText(textNote.getTextNoteContent());
                 break;
             case 1:
                 MediaNoteHolder mediaNoteHolder = (MediaNoteHolder) holder;
                 MediaNote mediaNote = (MediaNote) notes.get(position);
 
                 mediaNoteHolder.title.setText(mediaNote.getTitle());
-                mediaNoteHolder.content.setText(mediaNote.getContent());
+                mediaNoteHolder.content.setText(mediaNote.getTextNoteContent());
                 Picasso.with(context).load(mediaNote.getMediaUrl()).into(mediaNoteHolder.imageView);
 
                 break;

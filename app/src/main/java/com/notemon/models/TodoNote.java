@@ -10,8 +10,8 @@ public class TodoNote extends BaseNote {
 
     private List<TodoTask> tasks;
 
-    public TodoNote(String title, int type, List<TodoTask> tasks) {
-        super(title, type);
+    public TodoNote(String title, int type, List<TodoTask> tasks, String content) {
+        super(title, type, content);
         this.tasks = tasks;
     }
 
@@ -22,4 +22,10 @@ public class TodoNote extends BaseNote {
     public void setTasks(List<TodoTask> tasks) {
         this.tasks = tasks;
     }
+
+//    @Override
+//    public String toString() {
+//        String res = "";
+//        for(TodoTask task: )
+//    }
 }

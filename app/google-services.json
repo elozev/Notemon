@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "375628387063",
+    "firebase_url": "https://notemon-4c501.firebaseio.com",
+    "project_id": "notemon-4c501",
+    "storage_bucket": "notemon-4c501.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:375628387063:android:89a8e091c4d89f8a",
+        "android_client_info": {
+          "package_name": "com.notemon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "375628387063-f0ru2h6hlgi12lah04ehu7caj8amrqr6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.notemon",
+            "certificate_hash": "5c3183d2e3bba8a68a322df7c6dcfa6c7ccddb29"
+          }
+        },
+        {
+          "client_id": "375628387063-ng9k06i8f4mc5el1lktfmj9ptbkteneu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCchjf8tDfhSNRLDyAq2x4WZmqjeH5bDQ4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "375628387063-ng9k06i8f4mc5el1lktfmj9ptbkteneu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

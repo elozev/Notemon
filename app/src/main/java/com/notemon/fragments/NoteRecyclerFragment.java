@@ -19,16 +19,15 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.notemon.activities.BasicNote;
-import com.notemon.helpers.Constants;
 import com.notemon.R;
+import com.notemon.activities.BasicNote;
 import com.notemon.adapters.NotesRecyclerAdapter;
+import com.notemon.helpers.Constants;
 import com.notemon.models.BaseNote;
-import com.notemon.models.MediaNote;
 import com.notemon.models.Status;
 import com.notemon.models.TextNote;
-import com.notemon.models.TodoNote;
 import com.notemon.models.TodoTask;
+import com.notemon.rest.RestMethods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +51,7 @@ public class NoteRecyclerFragment extends Fragment {
 
     @BindView(R.id.fabRecycler)
     FloatingActionsMenu fabMenu;
+    private Long projectId;
 
     @Nullable
     @Override
@@ -60,7 +60,8 @@ public class NoteRecyclerFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        setUpRecycler();
+        projectId = getArguments().getLong(Constants.PROJECT_ID);
+        //setUpRecycler();
         return view;
     }
 
@@ -159,7 +160,7 @@ public class NoteRecyclerFragment extends Fragment {
                 .title("Enter content:")
                 .inputRangeRes(1, 200, R.color.project_red)
                 .alwaysCallInputCallback()
-                .input(getString(R.string.content), null, new MaterialDialog.InputCallback() {
+                .input("Content", null, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog3, @NonNull CharSequence input3) {
                         noteContent = input3.toString();
@@ -178,7 +179,11 @@ public class NoteRecyclerFragment extends Fragment {
     }
 
     private void createTextNote(String noteTitle, String content) {
-        //TODO: call the api post
+
+        TextNote textNote = new TextNote(noteTitle, Constants.NOTE_TYPE_TEXT, noteContent);
+
+
+        RestMethods.createNoteToProject(getActivity(), projectId, textNote);
 
         Toast.makeText(getActivity(), "Media Note", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), BasicNote.class);
@@ -201,13 +206,13 @@ public class NoteRecyclerFragment extends Fragment {
         tasks.add(new TodoTask("8", Status.TODO, 1));
         tasks.add(new TodoTask("9", Status.DONE, 1));
 
-
-        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
-        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
-        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
-        notes.add(new TodoNote("Title todo 2", Constants.NOTE_TYPE_TODO, tasks));
-        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
-        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
+//
+//        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
+//        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
+//        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
+//        notes.add(new TodoNote("Title todo 2", Constants.NOTE_TYPE_TODO, tasks));
+//        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
+//        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
 
         for (BaseNote note : notes) {
             Log.d(TAG, "Note type:" + note.getType());

@@ -23,4 +23,5 @@ public interface Constants {
     String TOKEN = "user_token";
     String LOGIN_PROGRESS = "login_progress";
     String REGISTRATION_PROGRESS = "registration_progress";
+    String TOKEN_PREFIX = "JWT ";
 }
