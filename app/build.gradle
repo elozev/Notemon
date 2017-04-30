@@ -27,10 +27,6 @@ dependencies {
     })
 
 
-
-
-
-
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -43,6 +39,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.leocardz:link-preview:1.2.2@aar'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.freesoulapps:preview-android:0.3.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'

@@ -19,5 +19,8 @@ public interface Constants {
     int NOTE_TYPE_MEDIA= 1;
     int NOTE_TYPE_TODO = 2;
 
-
+    String USER_DETAILS = "user_details_shared_prefs";
+    String TOKEN = "user_token";
+    String LOGIN_PROGRESS = "login_progress";
+    String REGISTRATION_PROGRESS = "registration_progress";
 }

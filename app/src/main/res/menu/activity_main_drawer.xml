@@ -10,7 +10,10 @@
             android:id="@+id/navSharedNotes"
             android:icon="@drawable/ic_share_black_24dp"
             android:title="@string/shared_notes"/>
-
+        <item
+            android:id="@+id/navReminders"
+            android:icon="@drawable/ic_alarm_black_24dp"
+            android:title="@string/reminders"/>
     </group>
 
 

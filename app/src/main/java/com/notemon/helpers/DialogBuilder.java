@@ -21,6 +21,7 @@ public class DialogBuilder {
     private static Context activityContext;
 
     private static String collaboratorUsername;
+
     public static void enterUsername(final Context context) {
         new MaterialDialog.Builder(context)
                 .title(R.string.add_collaborator)
@@ -42,7 +43,6 @@ public class DialogBuilder {
                 })
                 .show();
     }
-
 
     public static void promptForDelete(final Context context) {
         new MaterialDialog.Builder(context)
@@ -72,9 +72,7 @@ public class DialogBuilder {
         }
     };
 
-
-
-    public static void addReminder(Context context){
+    public static void addReminder(Context context) {
         activityContext = context;
         new DatePickerDialog(context, date, calendar
                 .get(Calendar.YEAR), calendar.get(Calendar.MONTH),
@@ -89,5 +87,34 @@ public class DialogBuilder {
 //                .title(R.string.add_to_project)
 //                .items()
 
+    }
+
+    static MaterialDialog dialog;
+
+    public static void startProgressDialog(Context context, String type) {
+        String title = "";
+        String content = "";
+
+        switch (type){
+            case Constants.LOGIN_PROGRESS:
+                title = context.getString(R.string.title_login);
+                content = context.getString(R.string.content_login);
+                break;
+            case Constants.REGISTRATION_PROGRESS:
+                title = context.getString(R.string.title_reg);
+                content = context.getString(R.string.content_reg);
+                break;
+        }
+
+        dialog = new MaterialDialog.Builder(context)
+                .title(title)
+                .content(content)
+                .progress(true, 0)
+                .show();
+
+    }
+
+    public static void dissmissProgressDialog() {
+        dialog.dismiss();
     }
 }

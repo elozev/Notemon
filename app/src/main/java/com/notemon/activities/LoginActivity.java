@@ -3,22 +3,24 @@ package com.notemon.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,9 +32,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.notemon.R;
+import com.notemon.models.User;
+import com.notemon.rest.RestMethods;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -56,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -64,10 +71,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    @BindView(R.id.signUpTextView)
+    TextView signUpTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -94,12 +106,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        setUpSignUpSpan();
+    }
+
+
+    @OnClick(R.id.signUpTextView)
+    public void signUpClick(){
+        startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
+    }
+
+    private void setUpSignUpSpan(){
+        Spannable text = new SpannableString("Not a member? Sign up!");
+        text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), 14, 22, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        signUpTextView.setText(text);
     }
 
     private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
+//        if (!mayRequestContacts()) {
+//            return;
+//        }
 
         getLoaderManager().initLoader(0, null, this);
     }
@@ -145,9 +170,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -185,15 +207,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            User user = new User();
+            user.setUsername(email);
+            user.setPassword(password);
+
+            callAuthentication(user);
         }
+    }
+
+    private void callAuthentication(User user) {
+        RestMethods.loginUser(user, LoginActivity.this);
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
@@ -290,61 +318,5 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 }
 
