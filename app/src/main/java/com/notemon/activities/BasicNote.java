@@ -1,27 +1,23 @@
-package com.notemon;
+package com.notemon.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.TextView;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.notemon.R;
 import com.notemon.fragments.MediaNoteFragment;
 import com.notemon.fragments.TextNoteFragment;
 import com.notemon.fragments.TodoListNoteFragment;
-import com.notemon.models.TodoTask;
+import com.notemon.helpers.Constants;
+import com.notemon.helpers.DialogBuilder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class BasicNote extends AppCompatActivity {
 
@@ -37,7 +33,6 @@ public class BasicNote extends AppCompatActivity {
         setContentView(R.layout.activity_basic_note);
         ButterKnife.bind(this);
 
-
         setSupportActionBar(toolbar);
 
         String noteType = getIntent().getStringExtra(Constants.NOTE_TYPE);
@@ -50,13 +45,11 @@ public class BasicNote extends AppCompatActivity {
         replaceFragment(noteType);
     }
 
-
     //TODO: replace with the title of the note and send the needed objects
     private void replaceFragment(String noteType) {
         FragmentManager manager = getFragmentManager();
 
-
-        switch (noteType){
+        switch (noteType) {
             case Constants.NOTE_TEXT:
                 toolbar.setTitle(title);
 
@@ -104,4 +97,34 @@ public class BasicNote extends AppCompatActivity {
         inflater.inflate(R.menu.note_menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        String msg = "";
+        switch (id) {
+            case R.id.action_add_reminder:
+                msg = "reminder";
+                DialogBuilder.addReminder(this);
+                break;
+            case R.id.action_add_to_project:
+                msg = "add to project";
+                DialogBuilder.addToProject(this);
+                break;
+            case R.id.action_share_to_user:
+                msg = "share to user";
+                DialogBuilder.enterUsername(this);
+                break;
+            case R.id.action_delete:
+                msg = "delete";
+                DialogBuilder.promptForDelete(this);
+                break;
+        }
+
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.notemon;
+package com.notemon.helpers;
 
 /**
  * Created by emil on 22.04.17.

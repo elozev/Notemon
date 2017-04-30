@@ -22,6 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 /**
  * Created by emil on 22.04.17.
@@ -53,8 +54,8 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
             textView.setText(content);
             checkHasItLink(content);
             textView.setMovementMethod(new ScrollingMovementMethod());
-
         }
+        textView.setMovementMethod(new ScrollingMovementMethod());
         return view;
     }
 
@@ -73,8 +74,8 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
         }
     }
 
-    @OnClick(R.id.textNoteText)
-    public void textClick() {
+    @OnLongClick(R.id.textNoteText)
+    public boolean textClick() {
         Toast.makeText(getActivity(), "Edit textView", Toast.LENGTH_SHORT).show();
 
         new MaterialDialog.Builder(getActivity())
@@ -99,6 +100,8 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
                 })
                 .negativeText("Cancel")
                 .show();
+
+        return false;
     }
 
     //TODO

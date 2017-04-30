@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.notemon.fragments.NoteRecyclerFragment;
+import com.notemon.helpers.Constants;
 import com.notemon.models.Project;
 
 import java.util.ArrayList;
@@ -120,9 +121,6 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Adding Project", Toast.LENGTH_SHORT).show();
             createProject();
         }
-// else if(id == projectSubMenu.getItem(1).getItemId()){
-//            Toast.makeText(this, "First Project", Toast.LENGTH_SHORT).show();
-//        }
 
         for (Map.Entry<Integer, Project> entry : projectMap.entrySet()) {
             if (id == projectSubMenu.getItem(entry.getKey()).getItemId()) {
@@ -177,19 +175,15 @@ public class MainActivity extends AppCompatActivity
         if (isHome) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             toolbar.setTitle(R.string.notemon_title);
-//            toolbar.setTitleTextColor(getResources().getColor(R.color.black));
-//            toolbar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 setToolbarColor(getResources().getColor(R.color.colorPrimaryDark));
             }
 
         } else {
-//            Log.d(TAG, projectColor + ": lainoooooo");
             toolbar.setBackgroundColor(project.getColor());
             toolbar.setTitle(project.getName());
             toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-//            toolbar.setSystemUiVisibility(0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 setToolbarColor(project.getColorDark());
             }

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.notemon.Constants;
+import com.notemon.helpers.Constants;
 import com.notemon.R;
 import com.squareup.picasso.Picasso;
 
