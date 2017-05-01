@@ -67,7 +67,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 BaseNote baseNote = notes.get(position);
                 TextNoteHolder textNoteHolder = (TextNoteHolder) holder;
 
-                TextNote textNote = new TextNote(baseNote.getTitle(), baseNote.getType(), baseNote.getContent());
+                TextNote textNote = new TextNote(baseNote.getTitle(), baseNote.getContentType(), baseNote.getContent());
 
                 textNoteHolder.title.setText(textNote.getTitle());
                 textNoteHolder.content.setText(textNote.getContent());
@@ -118,7 +118,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemViewType(int position) {
-        return notes.get(position).getType();
+        return notes.get(position).getContentType();
     }
 
     class TextNoteHolder extends RecyclerView.ViewHolder {

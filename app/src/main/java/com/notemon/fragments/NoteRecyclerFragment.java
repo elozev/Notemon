@@ -304,7 +304,7 @@ public class NoteRecyclerFragment extends Fragment {
         Toast.makeText(getActivity(), "NoteTitle: " + noteTitle + "; Content: " + content, Toast.LENGTH_SHORT).show();
         TextNote textNote = new TextNote(noteTitle, Constants.NOTE_TYPE_TEXT, content);
         BaseNote baseNote = new BaseNote(textNote.getTitle(), Constants.NOTE_TYPE_TEXT, content);
-        baseNote.setType(Constants.NOTE_TYPE_TEXT);
+        baseNote.setContentType(Constants.NOTE_TYPE_TEXT);
 
         Call<String> call = RestMethods.createNoteToProject(getActivity(), projectId, baseNote);
 

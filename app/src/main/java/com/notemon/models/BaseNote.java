@@ -7,18 +7,18 @@ import java.util.Date;
  * Created by emil on 4/26/17.
  */
 
-public class BaseNote implements Serializable{
+public class BaseNote implements Serializable {
 
     private Long id;
     private String title;
     private Date reminder;
     private Date createdAt;
     private String content;
-    private int type;
+    private int contentType;
 
     public BaseNote(String title, int type, String content) {
         this.title = title;
-        this.type = type;
+        this.contentType = type;
         this.content = content;
     }
 
@@ -54,12 +54,12 @@ public class BaseNote implements Serializable{
         this.id = id;
     }
 
-    public int getType() {
-        return type;
+    public int getContentType() {
+        return contentType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setContentType(int type) {
+        this.contentType = type;
     }
 
     public String getContent() {
