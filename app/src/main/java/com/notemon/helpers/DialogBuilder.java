@@ -18,6 +18,7 @@ import com.notemon.models.Project;
 import com.notemon.models.Status;
 import com.notemon.models.TodoNote;
 import com.notemon.models.TodoTask;
+import com.notemon.models.Username;
 import com.notemon.rest.RestMethods;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class DialogBuilder {
 
     private static String collaboratorUsername;
 
-    public static void enterUsername(final Context context) {
+    public static void enterUsername(final Context context, final Long noteId) {
         new MaterialDialog.Builder(context)
                 .title(R.string.add_collaborator)
                 .alwaysCallInputCallback()
@@ -59,6 +60,9 @@ public class DialogBuilder {
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //TODO: add api call here
                         Toast.makeText(context, collaboratorUsername + " to api", Toast.LENGTH_SHORT).show();
+                        Username username = new Username();
+                        username.username = collaboratorUsername;
+                        RestMethods.addUserToNote(context, username, noteId);
                     }
                 })
                 .show();

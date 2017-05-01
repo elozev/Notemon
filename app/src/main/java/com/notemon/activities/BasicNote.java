@@ -142,7 +142,7 @@ public class BasicNote extends AppCompatActivity implements com.wdullaer.materia
                 break;
             case R.id.action_share_to_user:
                 msg = "share to user";
-                DialogBuilder.enterUsername(this);
+                DialogBuilder.enterUsername(this, noteId);
                 break;
             case R.id.action_delete:
                 msg = "delete";

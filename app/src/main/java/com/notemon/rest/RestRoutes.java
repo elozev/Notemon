@@ -6,6 +6,7 @@ import com.notemon.models.Project;
 import com.notemon.models.Reminder;
 import com.notemon.models.Token;
 import com.notemon.models.User;
+import com.notemon.models.Username;
 
 import java.util.List;
 
@@ -57,6 +58,8 @@ public interface RestRoutes {
     @POST("notes/{id}/reminder")
     Call<String> addReminderToNote(@Path("id") Long id, @Header("Authorization") String token, @Body Reminder reminder);
 
+    @POST("notes/{id}/users")
+    Call<String> addUserToNote(@Path("id") Long id, @Header("Authorization") String token, @Body Username username);
 
     //URLS FOR USERS
     @POST("users/deviceToken")

@@ -16,6 +16,7 @@ import com.notemon.models.Project;
 import com.notemon.models.Reminder;
 import com.notemon.models.Token;
 import com.notemon.models.User;
+import com.notemon.models.Username;
 
 import java.util.List;
 
@@ -256,6 +257,38 @@ public class RestMethods {
             public void onResponse(Call<String> call, Response<String> response) {
                 Toast.makeText(context, response.code() + "", Toast.LENGTH_SHORT).show();
 
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(context, "Success in adding token", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 401:
+                        Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                        break;
+                    case 500:
+                        Toast.makeText(context, "Internal server error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "500: " + response.message() + "\n" + response.body() + "\n" + response.errorBody() + "\n" + response.raw() + "\n" + response.toString());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(TAG, t.toString());
+                Toast.makeText(context, "Failure with creating project!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void addUserToNote(final Context context, Username username, Long noteId){
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        Call<String> call = routes.addUserToNote(noteId, token, username);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
                 switch (response.code()) {
                     case 200:
                         Toast.makeText(context, "Success in adding token", Toast.LENGTH_SHORT).show();
