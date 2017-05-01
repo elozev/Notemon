@@ -1,12 +1,19 @@
 package com.notemon.fragments;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,23 +25,30 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.gifdecoder.GifHeaderParser;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.notemon.R;
 import com.notemon.activities.BasicNote;
 import com.notemon.adapters.NotesRecyclerAdapter;
 import com.notemon.helpers.Constants;
+import com.notemon.helpers.DialogBuilder;
+import com.notemon.helpers.DocumentHelper;
 import com.notemon.models.BaseNote;
-import com.notemon.models.Status;
 import com.notemon.models.TextNote;
-import com.notemon.models.TodoTask;
+import com.notemon.models.UploadImage;
 import com.notemon.rest.RestMethods;
+import com.notemon.rest.UploadService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
@@ -46,6 +60,7 @@ import static android.content.ContentValues.TAG;
 public class NoteRecyclerFragment extends Fragment {
 
     private static final int REQUEST_SPEECH_INPUT = 451;
+    private static final int MY_PERMISSIONS_REQUEST_READ_STORAGE = 412;
     @BindView(R.id.noteRecycler)
     RecyclerView noteRecycler;
 
@@ -61,12 +76,33 @@ public class NoteRecyclerFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         projectId = getArguments().getLong(Constants.PROJECT_ID);
-        //setUpRecycler();
+        getNotesForProject();
+//        createTextNote("Title", "Content");
         return view;
     }
 
-    private void setUpRecycler() {
-        NotesRecyclerAdapter adapter = new NotesRecyclerAdapter(testListForRecycler(), getActivity());
+    private void getNotesForProject() {
+        Call<List<BaseNote>> call = RestMethods.getNotesFromProject(projectId);
+        call.enqueue(new Callback<List<BaseNote>>() {
+            @Override
+            public void onResponse(Call<List<BaseNote>> call, Response<List<BaseNote>> response) {
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(getActivity(), "Success in getting notes from project", Toast.LENGTH_SHORT).show();
+                        setUpRecycler(response.body());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<BaseNote>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void setUpRecycler(List<BaseNote> notes) {
+        NotesRecyclerAdapter adapter = new NotesRecyclerAdapter(notes, getActivity());
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
         noteRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         noteRecycler.setAdapter(adapter);
@@ -74,28 +110,27 @@ public class NoteRecyclerFragment extends Fragment {
 
     @OnClick(R.id.addMediaNote)
     public void mediaNoteClick() {
-        Toast.makeText(getActivity(), "Media Note", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(), BasicNote.class);
-        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
-        startActivity(intent);
-
+//        Intent intent = new Intent(getActivity(), BasicNote.class);
+//        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
+//        startActivity(intent);
+        dialogTitleNote(Constants.NOTE_TYPE_MEDIA);
     }
 
     @OnClick(R.id.addTextNote)
     public void textNoteClick() {
-        Toast.makeText(getActivity(), "Text Note", Toast.LENGTH_SHORT).show();
-        dialogTitleNote(false);
+        dialogTitleNote(Constants.NOTE_TYPE_TEXT);
     }
 
     @OnClick(R.id.addVoiceNote)
     public void voiceNoteClick() {
-        Toast.makeText(getActivity(), "Voice Note", Toast.LENGTH_SHORT).show();
-        dialogTitleNote(true);
+        dialogTitleNote(Constants.NOTE_TYPE_VOICE);
     }
 
     @OnClick(R.id.addTodoList)
     public void todoListClick() {
         Toast.makeText(getActivity(), "TodoList Note", Toast.LENGTH_SHORT).show();
+        //TODO implement
+        DialogBuilder.preTodo(getActivity(), projectId);
     }
 
     private void createVoiceNote() {
@@ -112,6 +147,7 @@ public class NoteRecyclerFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -126,13 +162,36 @@ public class NoteRecyclerFragment extends Fragment {
                 }
             }
             break;
+
+            case Constants.FILE_PICK: {
+                Uri returnUri;
+                if (resultCode != RESULT_OK)
+                    return;
+
+                returnUri = data.getData();
+                String filePath = DocumentHelper.getPath(getActivity(), returnUri);
+                if (filePath == null || filePath.isEmpty()) return;
+                File chosenFile = new File(filePath);
+
+                UploadImage upload = new UploadImage();
+                upload.image = chosenFile;
+                upload.title = "djakuzi";
+                upload.uri = returnUri;
+//                Picasso.with(getActivity()).load(returnUri).into(profilePhoto);
+                UploadService service = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    service = new UploadService(getContext(), getActivity());
+                }
+                service.buildRestAdapter(upload);
+            }
+            break;
         }
     }
 
     String noteTitle;
     String noteContent;
 
-    private void dialogTitleNote(final boolean isVoiceNote) {
+    private void dialogTitleNote(final int type) {
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.enter_title)
                 .inputRangeRes(1, 200, R.color.project_red)
@@ -144,15 +203,78 @@ public class NoteRecyclerFragment extends Fragment {
                 }).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                if (isVoiceNote)
-                    createVoiceNote();
-                else {
-                    dialog.dismiss();
-                    dialogNoteContent();
+                switch (type) {
+                    case Constants.NOTE_TYPE_VOICE:
+                        createVoiceNote();
+                        break;
+                    case Constants.NOTE_TYPE_TEXT:
+                        dialog.dismiss();
+                        dialogNoteContent();
+                        break;
+                    case Constants.NOTE_TYPE_MEDIA:
+                        dialogPickFile();
                 }
             }
         })
                 .show();
+    }
+
+    private void dialogPickFile() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            filePicker();
+        } else {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                new MaterialDialog.Builder(getActivity())
+                        .title("Permissions needed!")
+                        .content("App needs permissions to access storage")
+                        .positiveText("OK")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                requestPermission();
+                            }
+                        })
+                        .show();
+            } else {
+                requestPermission();
+            }
+
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                MY_PERMISSIONS_REQUEST_READ_STORAGE);
+    }
+
+    private void filePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, Constants.FILE_PICK);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    filePicker();
+                } else {
+                    new MaterialDialog.Builder(getActivity())
+                            .title("Permissions needed!")
+                            .content("App needs permissions to access storage")
+                            .positiveText("OK")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    requestPermission();
+                                }
+                            })
+                            .show();
+                }
+        }
     }
 
     private void dialogNoteContent() {
@@ -179,44 +301,41 @@ public class NoteRecyclerFragment extends Fragment {
     }
 
     private void createTextNote(String noteTitle, String content) {
+        Toast.makeText(getActivity(), "NoteTitle: " + noteTitle + "; Content: " + content, Toast.LENGTH_SHORT).show();
+        TextNote textNote = new TextNote(noteTitle, Constants.NOTE_TYPE_TEXT, content);
+        BaseNote baseNote = new BaseNote(textNote.getTitle(), Constants.NOTE_TYPE_TEXT, content);
+        baseNote.setType(Constants.NOTE_TYPE_TEXT);
 
-        TextNote textNote = new TextNote(noteTitle, Constants.NOTE_TYPE_TEXT, noteContent);
+        Call<String> call = RestMethods.createNoteToProject(getActivity(), projectId, baseNote);
 
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d(GifHeaderParser.TAG, response.raw().toString());
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(getActivity(), "Success in creating note into project", Toast.LENGTH_SHORT).show();
+                        getNotesForProject();
+                        break;
 
-        RestMethods.createNoteToProject(getActivity(), projectId, textNote);
+                    case 401:
+                        Toast.makeText(getActivity(), "401 in creating note into project", Toast.LENGTH_SHORT).show();
+                        Log.d(GifHeaderParser.TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                }
+            }
 
-        Toast.makeText(getActivity(), "Media Note", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(GifHeaderParser.TAG, t.toString());
+                Toast.makeText(getActivity(), "Failure with adding note to project!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         Intent intent = new Intent(getActivity(), BasicNote.class);
         intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
-        intent.putExtra("note_title", noteTitle);
-        intent.putExtra("note_content", content);
+        intent.putExtra(Constants.NOTE_TITLE, noteTitle);
+        intent.putExtra(Constants.NOTE_TEXT_CONTENT, content);
         startActivity(intent);
     }
 
-    private List<BaseNote> testListForRecycler() {
-        List<BaseNote> notes = new ArrayList<>();
-        List<TodoTask> tasks = new ArrayList<>();
-
-        tasks.add(new TodoTask("1", Status.DONE, 1));
-        tasks.add(new TodoTask("2", Status.DONE, 1));
-        tasks.add(new TodoTask("3", Status.TODO, 1));
-        tasks.add(new TodoTask("4", Status.DONE, 1));
-        tasks.add(new TodoTask("5", Status.TODO, 1));
-        tasks.add(new TodoTask("7", Status.TODO, 1));
-        tasks.add(new TodoTask("8", Status.TODO, 1));
-        tasks.add(new TodoTask("9", Status.DONE, 1));
-
-//
-//        notes.add(new TextNote("Title 1", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
-//        notes.add(new MediaNote("Title Media 2", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
-//        notes.add(new TextNote("Title 2", Constants.NOTE_TYPE_TEXT, getString(R.string.long_text)));
-//        notes.add(new TodoNote("Title todo 2", Constants.NOTE_TYPE_TODO, tasks));
-//        notes.add(new MediaNote("Title Media 1", Constants.NOTE_TYPE_MEDIA, getString(R.string.long_text), "http://kingofwallpapers.com/picture/picture-010.jpg"));
-//        notes.add(new TodoNote("Title todo 1", Constants.NOTE_TYPE_TODO, tasks));
-
-        for (BaseNote note : notes) {
-            Log.d(TAG, "Note type:" + note.getType());
-        }
-        return notes;
-    }
 }

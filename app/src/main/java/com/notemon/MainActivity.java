@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity
                 baseProject = p;
             }
         }
+        setupFrontFragment(true, baseProject);
         addProjectsToNav(projectMap);
     }
 
@@ -171,13 +172,13 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Adding Project", Toast.LENGTH_SHORT).show();
             createProject();
         }
-
-        for (Map.Entry<Integer, Project> entry : projectMap.entrySet()) {
-            if (id == projectSubMenu.getItem(entry.getKey()).getItemId()) {
-                Toast.makeText(this, "Project" + entry.getKey(), Toast.LENGTH_SHORT).show();
-                setupFrontFragment(false, entry.getValue());
+        if (projectMap != null)
+            for (Map.Entry<Integer, Project> entry : projectMap.entrySet()) {
+                if (id == projectSubMenu.getItem(entry.getKey()).getItemId()) {
+                    Toast.makeText(this, "Project" + entry.getKey(), Toast.LENGTH_SHORT).show();
+                    setupFrontFragment(false, entry.getValue());
+                }
             }
-        }
 
         switch (id) {
             case R.id.navHome:
@@ -285,6 +286,8 @@ public class MainActivity extends AppCompatActivity
                 Project project = new Project(ColorValues.getColorId(projectColorAdd, MainActivity.this), ColorValues.getDarkColorId(projectColorAdd, MainActivity.this), projectNameAdd);
 
                 RestMethods.createProject(project, MainActivity.this, false);
+
+                getProjectsForUser();
                 return true;
             }
         })
@@ -293,6 +296,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addProjectsToNav(Map<Integer, Project> projects) {
+        projectSubMenu.removeGroup(1);
         for (Map.Entry<Integer, Project> entry : projects.entrySet()) {
             projectSubMenu.add(1, entry.getKey() + 1, entry.getKey(), entry.getValue().getName())
                     .setIcon(R.drawable.ic_flag_black_24dp);

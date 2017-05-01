@@ -1,21 +1,24 @@
 package com.notemon.models;
 
+import java.io.Serializable;
+
 /**
  * Created by emil on 23.04.17.
  */
 
-public class TodoTask {
+public class TodoTask implements Serializable{
 
 
     private String content;
     private Status status;
     private int order;
 
-    public TodoTask(String content, Status status, int order) {
+    public TodoTask(String content, int order, Status status) {
         this.content = content;
         this.status = status;
         this.order = order;
     }
+    public TodoTask(){}
 
     public String getContent() {
         return content;

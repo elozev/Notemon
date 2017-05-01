@@ -1,12 +1,13 @@
 package com.notemon.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by emil on 4/26/17.
  */
 
-public class BaseNote {
+public class BaseNote implements Serializable{
 
     private Long id;
     private String title;
@@ -20,8 +21,6 @@ public class BaseNote {
         this.type = type;
         this.content = content;
     }
-
-
 
     public String getTitle() {
         return title;
@@ -63,11 +62,11 @@ public class BaseNote {
         this.type = type;
     }
 
-    public String getTextNoteContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setTextNoteContent(String textNoteContent) {
-        this.content = textNoteContent;
+    public void setContent(String content) {
+        this.content = content;
     }
 }

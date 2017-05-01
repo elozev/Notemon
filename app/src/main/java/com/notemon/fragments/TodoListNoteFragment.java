@@ -6,23 +6,32 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.notemon.R;
 import com.notemon.adapters.TodoListAdapter;
+import com.notemon.helpers.Constants;
 import com.notemon.models.Status;
+import com.notemon.models.TodoNote;
 import com.notemon.models.TodoTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by emil on 23.04.17.
@@ -45,21 +54,37 @@ public class TodoListNoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.note_todo, container, false);
         ButterKnife.bind(this, view);
 
-        tasks = new ArrayList<>();
-        tasks.add(new TodoTask("1", Status.DONE, 1));
-        tasks.add(new TodoTask("2", Status.DONE, 1));
-        tasks.add(new TodoTask("3", Status.TODO, 1));
-        tasks.add(new TodoTask("4", Status.DONE, 1));
-        tasks.add(new TodoTask("5", Status.TODO, 1));
-        tasks.add(new TodoTask("7", Status.TODO, 1));
-        tasks.add(new TodoTask("8", Status.TODO, 1));
-        tasks.add(new TodoTask("9", Status.DONE, 1));
+        TodoNote note = (TodoNote) getArguments().getSerializable(Constants.NOTE_TODO);
+        tasks = note.getTasks();
 
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
         adapter = new TodoListAdapter(tasks, getActivity());
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        String array = "";
+        try {
+            array = mapper.writeValueAsString(tasks);
+            Log.d(TAG, "------------------------JSON: \n" + array);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        TypeReference<List<TodoTask>> mapType = new TypeReference<List<TodoTask>>() {
+        };
+        List<TodoTask> jsonToPersonList= new ArrayList<>();
+        try {
+            jsonToPersonList = mapper.readValue(array, mapType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,"\n2. Convert JSON to List of person objects :");
+        for(TodoTask task: jsonToPersonList){
+            Log.d(TAG, "TASK" + task.getContent());
+        }
         return view;
     }
 
@@ -76,7 +101,7 @@ public class TodoListNoteFragment extends Fragment {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        tasks.add(new TodoTask(taskText, Status.TODO, 1));
+                        tasks.add(new TodoTask(taskText, 0, Status.TODO));
                         adapter.notifyItemInserted(0);
                         recyclerView.scrollToPosition(0);
                     }

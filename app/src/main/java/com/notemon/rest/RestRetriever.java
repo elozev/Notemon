@@ -23,4 +23,13 @@ public class RestRetriever {
         return retrofit;
     }
 
+
+    public static Retrofit getImageAdapter(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ImgurService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        return retrofit;
+    }
 }

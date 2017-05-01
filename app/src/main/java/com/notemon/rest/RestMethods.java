@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.notemon.MainActivity;
+import com.notemon.R;
 import com.notemon.helpers.Constants;
 import com.notemon.helpers.DialogBuilder;
 import com.notemon.models.BaseNote;
@@ -38,7 +39,7 @@ public class RestMethods {
             public void onResponse(Call<String> call, Response<String> response) {
                 Log.d(TAG, "Response " + response.raw());
                 Toast.makeText(context.getApplicationContext(), response.body(), Toast.LENGTH_SHORT).show();
-                DialogBuilder.dissmissProgressDialog();
+                DialogBuilder.dismissProgressDialog();
                 loginUser(user, context, true);
             }
 
@@ -48,14 +49,16 @@ public class RestMethods {
                 Log.d(TAG, "401: " + t.getMessage() + "\n");
 
                 Toast.makeText(context.getApplicationContext(), "Failure with creating user!", Toast.LENGTH_SHORT).show();
-                DialogBuilder.dissmissProgressDialog();
+                DialogBuilder.dismissProgressDialog();
             }
         });
     }
 
-    private static Project createBaseProject() {
+    private static Project createBaseProject(Context context) {
         Project project = new Project();
         project.setName("Base Project");
+        project.setColor(context.getResources().getColor(R.color.white));
+        project.setColorDark(context.getResources().getColor(R.color.white_pressed));
         return project;
     }
 
@@ -81,7 +84,7 @@ public class RestMethods {
 
                         if (isAfterReg) {
                             Log.d(TAG, isAfterReg + "");
-                            createProject(createBaseProject(), context, true);
+                            createProject(createBaseProject(context), context, true);
                         } else {
                             Log.d(TAG, isAfterReg + "");
                             startMainActivity(context);
@@ -90,13 +93,13 @@ public class RestMethods {
                     case 401:
                         Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
                 }
-                DialogBuilder.dissmissProgressDialog();
+                DialogBuilder.dismissProgressDialog();
             }
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
                 Log.e(TAG, t.toString());
-                DialogBuilder.dissmissProgressDialog();
+                DialogBuilder.dismissProgressDialog();
                 Toast.makeText(context, "Failure with logging user!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -117,6 +120,7 @@ public class RestMethods {
         createProjectCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                Log.d(TAG, call.request().toString());
                 switch (response.code()) {
                     case 200:
                         Toast.makeText(context, "Success in creating project", Toast.LENGTH_SHORT).show();
@@ -126,6 +130,12 @@ public class RestMethods {
                         break;
                     case 401:
                         Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                        break;
+                    case 500:
+                        Toast.makeText(context, "Internal server error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "500: " + response.message() + "\n" + response.body() + "\n" + response.errorBody() + "\n" + response.raw() + "\n" + response.toString());
+
+                        break;
                 }
             }
 
@@ -145,33 +155,18 @@ public class RestMethods {
         return routes.getProjects(token);
     }
 
-    public static void createNoteToProject(final Context context, Long projectId, BaseNote note) {
+    public static Call<String> createNoteToProject(final Context context, Long projectId, BaseNote note) {
         RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
         SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
         String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
 
         Call<String> call = routes.createNoteToProject(note, token, projectId);
 
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.d(TAG, response.raw().toString());
-                switch (response.code()) {
-                    case 200:
-                        Toast.makeText(context, "Success in creating note into project", Toast.LENGTH_SHORT).show();
+        return call;
+    }
 
-                        break;
-
-                    case 401:
-                        Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.e(TAG, t.toString());
-                Toast.makeText(context, "Failure with adding note to project!", Toast.LENGTH_SHORT).show();
-            }
-        });
+    public static Call<List<BaseNote>> getNotesFromProject(Long id) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        return routes.getNotesFromProject(id);
     }
 }

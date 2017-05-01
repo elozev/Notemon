@@ -1,16 +1,22 @@
 package com.notemon.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.notemon.R;
+import com.notemon.activities.BasicNote;
+import com.notemon.helpers.Constants;
+import com.notemon.helpers.TodoTaskSerialize;
 import com.notemon.models.BaseNote;
 import com.notemon.models.MediaNote;
 import com.notemon.models.TextNote;
@@ -55,28 +61,42 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case 0:
+                BaseNote baseNote = notes.get(position);
                 TextNoteHolder textNoteHolder = (TextNoteHolder) holder;
-                TextNote textNote = (TextNote) notes.get(position);
 
+                TextNote textNote = new TextNote(baseNote.getTitle(), baseNote.getType(), baseNote.getContent());
 
                 textNoteHolder.title.setText(textNote.getTitle());
-                textNoteHolder.content.setText(textNote.getTextNoteContent());
+                textNoteHolder.content.setText(textNote.getContent());
+                textNoteHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(context, "Click: " + notes.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(context, BasicNote.class);
+                        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
+                        intent.putExtra(Constants.NOTE_TITLE, notes.get(position).getTitle());
+                        intent.putExtra(Constants.NOTE_TEXT_CONTENT, notes.get(position).getContent());
+                        context.startActivity(intent);
+                    }
+                });
                 break;
             case 1:
                 MediaNoteHolder mediaNoteHolder = (MediaNoteHolder) holder;
                 MediaNote mediaNote = (MediaNote) notes.get(position);
 
                 mediaNoteHolder.title.setText(mediaNote.getTitle());
-                mediaNoteHolder.content.setText(mediaNote.getTextNoteContent());
+                mediaNoteHolder.content.setText(mediaNote.getContent());
                 Picasso.with(context).load(mediaNote.getMediaUrl()).into(mediaNoteHolder.imageView);
 
                 break;
             case 2:
+                BaseNote baseNote2 = notes.get(position);
                 TodoNoteHolder todoNoteHolder = (TodoNoteHolder) holder;
-                TodoNote todoNote = (TodoNote) notes.get(position);
+
+                TodoNote todoNote = new TodoNote(baseNote2.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.deserializeTasks(baseNote2.getContent()), baseNote2.getContent());
 
                 todoNoteHolder.title.setText(todoNote.getTitle());
 
@@ -102,6 +122,9 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     class TextNoteHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.noteTextRecyclerLinearLayout)
+        LinearLayout layout;
 
         @BindView(R.id.textTitleRecycler)
         TextView title;

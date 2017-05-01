@@ -1,12 +1,13 @@
 package com.notemon.models;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by emil on 4/26/17.
  */
 
-public class TodoNote extends BaseNote {
+public class TodoNote extends BaseNote implements Serializable {
 
     private List<TodoTask> tasks;
 

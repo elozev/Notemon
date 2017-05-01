@@ -15,13 +15,13 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.freesoulapps.preview.android.Preview;
 import com.notemon.R;
+import com.notemon.helpers.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnLongClick;
 
 /**
@@ -49,7 +49,7 @@ public class TextNoteFragment extends Fragment implements Preview.PreviewListene
         preview.setListener(this);
         preview.setVisibility(View.INVISIBLE);
 
-        content = getArguments().getString("note_content");
+        content = getArguments().getString(Constants.NOTE_TEXT_CONTENT);
         if (content != null) {
             textView.setText(content);
             checkHasItLink(content);

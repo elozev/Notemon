@@ -8,9 +8,9 @@ import java.io.Serializable;
 
 public class Project implements Serializable {
     private Long id;
+    private String name;
     private int color;
     private int colorDark;
-    private String name;
 
     public Project(int color, int colorDark, String name) {
         this.color = color;
@@ -18,12 +18,12 @@ public class Project implements Serializable {
         this.name = name;
     }
 
-    public Project(){}
+    public Project() {
+    }
 
     public Long getId() {
         return id;
     }
-
 
     public void setId(Long id) {
         this.id = id;

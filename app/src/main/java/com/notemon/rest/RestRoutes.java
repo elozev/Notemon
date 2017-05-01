@@ -41,5 +41,7 @@ public interface RestRoutes {
     @GET("projects/")
     Call<List<Project>> getProjects(@Header("Authorization") String token);
 
+    @GET("projects/{id}/notes")
+    Call<List<BaseNote>> getNotesFromProject(@Path("id") Long projectId);
     //URLS FOR NOTES
 }

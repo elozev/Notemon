@@ -16,7 +16,7 @@
     <string name="speech_not_supported">Sorry! Your device doesn\\\'t support speech input</string>
     <string name="enter_title">Enter title:</string>
     <string name="title">Title</string>
-    <string name="textNoteContent">Content</string>
+    <string name="content">Content</string>
     <string name="add_reminder">Add reminder</string>
     <string name="add_collaborator">Add collaborator</string>
     <string name="add_to_project">Add to project</string>
@@ -58,4 +58,7 @@
     <string name="content_login">Logging in ...</string>
     <string name="content_reg">Registration in progress ...</string>
     <string name="title_reg">Registration</string>
+    <string name="task_name">Task name</string>
+    <string name="add_next_task">Add next task</string>
+    <string name="finish">Finish</string>
 </resources>

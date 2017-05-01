@@ -2,15 +2,31 @@ package com.notemon.helpers;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.notemon.R;
+import com.notemon.activities.BasicNote;
+import com.notemon.models.BaseNote;
+import com.notemon.models.Status;
+import com.notemon.models.TodoNote;
+import com.notemon.models.TodoTask;
+import com.notemon.rest.RestMethods;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by emil on 30.04.17.
@@ -95,7 +111,7 @@ public class DialogBuilder {
         String title = "";
         String content = "";
 
-        switch (type){
+        switch (type) {
             case Constants.LOGIN_PROGRESS:
                 title = context.getString(R.string.title_login);
                 content = context.getString(R.string.content_login);
@@ -114,7 +130,99 @@ public class DialogBuilder {
 
     }
 
-    public static void dissmissProgressDialog() {
+    public static void dismissProgressDialog() {
         dialog.dismiss();
+    }
+
+    private static List<TodoTask> todoTasks;
+    private static String taskName = "";
+    private static String todoTitle = "";
+
+    public static void preTodo(Context c, final Long projectId) {
+        todoTasks = new ArrayList<>();
+        todoTitle = "";
+        taskName = "";
+        todoTitle(c, projectId);
+    }
+
+    private static void todoTitle(final Context context, final Long projectId) {
+        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .title("Todo Task")
+                .input("Todo List Title", null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        todoTitle = input.toString();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        todoTaskAdd(context, projectId);
+                    }
+                }).show();
+    }
+
+    private static void todoTaskAdd(final Context context, final Long projectId) {
+        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .title(R.string.add_task)
+                .alwaysCallInputCallback()
+                .input(context.getString(R.string.task_name), null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        taskName = input.toString();
+                    }
+                }).positiveText(R.string.add_next_task)
+                .negativeText(R.string.finish)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        TodoTask todoTask = new TodoTask(taskName, 0, Status.TODO);
+                        todoTasks.add(todoTask);
+                        dialog.dismiss();
+                        todoTaskAdd(context, projectId);
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        todoTasks.add(new TodoTask(taskName, 0, Status.TODO));
+                        Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                        TodoNote note = new TodoNote(todoTitle, Constants.NOTE_TYPE_TODO, todoTasks, "");
+
+                        startTodoNote(context, note, projectId);
+                    }
+                })
+                .show();
+    }
+
+    private static void startTodoNote(final Context context, TodoNote note, Long projectId) {
+        BaseNote baseNote = new BaseNote(note.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.serializeTasks(note.getTasks()));
+
+
+        Call<String> call = RestMethods.createNoteToProject(context, projectId, baseNote);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(context, "Successfully created note to project!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 401:
+                        Toast.makeText(context, "Unauthorized!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d(TAG, t.toString());
+                Toast.makeText(context, "Failure!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Intent intent = new Intent(context, BasicNote.class);
+        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TODO);
+        intent.putExtra(Constants.NOTE_TODO, note);
+        context.startActivity(intent);
     }
 }

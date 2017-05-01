@@ -1,6 +1,7 @@
 package com.notemon.activities;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,7 @@ import com.notemon.fragments.TextNoteFragment;
 import com.notemon.fragments.TodoListNoteFragment;
 import com.notemon.helpers.Constants;
 import com.notemon.helpers.DialogBuilder;
+import com.notemon.models.TodoNote;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,27 +37,28 @@ public class BasicNote extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        String noteType = getIntent().getStringExtra(Constants.NOTE_TYPE);
-
-        title = getIntent().getStringExtra("note_title");
-        content = getIntent().getStringExtra("note_content");
+//        title = getIntent().getStringExtra("note_title");
+//        content = getIntent().getStringExtra("note_content");
 
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        replaceFragment(noteType);
+        replaceFragment(getIntent());
     }
 
     //TODO: replace with the title of the note and send the needed objects
-    private void replaceFragment(String noteType) {
+    private void replaceFragment(Intent intent) {
         FragmentManager manager = getFragmentManager();
 
-        switch (noteType) {
+        switch (intent.getStringExtra(Constants.NOTE_TYPE)) {
             case Constants.NOTE_TEXT:
+                title = intent.getStringExtra(Constants.NOTE_TITLE);
+                content = intent.getStringExtra(Constants.NOTE_TEXT_CONTENT);
+
                 toolbar.setTitle(title);
 
                 TextNoteFragment textNoteFragment = new TextNoteFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString("note_content", content);
+                bundle.putString(Constants.NOTE_TEXT_CONTENT, content);
                 textNoteFragment.setArguments(bundle);
 
                 manager.beginTransaction()
@@ -75,14 +78,18 @@ public class BasicNote extends AppCompatActivity {
                         .commit();
                 break;
             case Constants.NOTE_TODO:
+//                title = intent.get
+                TodoNote note = (TodoNote) intent.getSerializableExtra(Constants.NOTE_TODO);
 
                 TodoListNoteFragment todoFragment = new TodoListNoteFragment();
-
+                Bundle argsTodo = new Bundle();
+                argsTodo.putSerializable(Constants.NOTE_TODO, note);
+                todoFragment.setArguments(argsTodo);
                 manager.beginTransaction()
                         .replace(R.id.basicNoteFrameLayout, todoFragment)
                         .commit();
 
-                toolbar.setTitle("Todo Note");
+                toolbar.setTitle(note.getTitle());
                 break;
             case Constants.NOTE_VOICE:
                 toolbar.setTitle("Voice Note");
