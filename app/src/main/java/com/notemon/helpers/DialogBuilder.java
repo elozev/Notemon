@@ -196,7 +196,7 @@ public class DialogBuilder {
     }
 
     private static void startTodoNote(final Context context, TodoNote note, Long projectId) {
-        BaseNote baseNote = new BaseNote(note.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.serializeTasks(note.getTasks()));
+        BaseNote baseNote = new BaseNote(note.getTitle(), Constants.NOTE_TYPE_TODO, ContentSerializer.serializeTasks(note.getTasks()));
 
 
         Call<String> call = RestMethods.createNoteToProject(context, projectId, baseNote);

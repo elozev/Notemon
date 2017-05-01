@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.notemon.helpers.Constants;
 import com.notemon.R;
+import com.notemon.models.MediaNote;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -40,9 +41,11 @@ public class MediaNoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.note_media, container, false);
         ButterKnife.bind(this, view);
 
-        url = getArguments().getString(Constants.NOTE_MEDIA_URL);
-        Picasso.with(getActivity()).load(url).into(imageView);
+//        url = getArguments().getString(Constants.NOTE_MEDIA_URL);
 
+        MediaNote note = (MediaNote) getArguments().getSerializable(Constants.NOTE_MEDIA);
+        Picasso.with(getActivity()).load(note.getMediaUrl()).into(imageView);
+        textView.setText(note.getContent());
         textView.setMovementMethod(new ScrollingMovementMethod());
 
         return view;

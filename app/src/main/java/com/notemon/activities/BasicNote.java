@@ -36,10 +36,6 @@ public class BasicNote extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-
-//        title = getIntent().getStringExtra("note_title");
-//        content = getIntent().getStringExtra("note_content");
-
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         replaceFragment(getIntent());
@@ -59,6 +55,7 @@ public class BasicNote extends AppCompatActivity {
                 TextNoteFragment textNoteFragment = new TextNoteFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(Constants.NOTE_TEXT_CONTENT, content);
+                bundle.putSerializable(Constants.NOTE_TEXT, intent.getSerializableExtra(Constants.NOTE_TEXT));
                 textNoteFragment.setArguments(bundle);
 
                 manager.beginTransaction()
@@ -66,19 +63,18 @@ public class BasicNote extends AppCompatActivity {
                         .commit();
                 break;
             case Constants.NOTE_MEDIA:
-                toolbar.setTitle("Media Notes");
 
                 MediaNoteFragment mediaNoteFragment = new MediaNoteFragment();
                 Bundle args = new Bundle();
-                args.putString(Constants.NOTE_MEDIA_URL, "http://kingofwallpapers.com/picture/picture-008.jpg");
+                args.putSerializable(Constants.NOTE_MEDIA, intent.getSerializableExtra(Constants.NOTE_MEDIA));
                 mediaNoteFragment.setArguments(args);
 
                 manager.beginTransaction()
                         .replace(R.id.basicNoteFrameLayout, mediaNoteFragment)
                         .commit();
+                toolbar.setTitle(intent.getStringExtra(Constants.NOTE_TITLE));
                 break;
             case Constants.NOTE_TODO:
-//                title = intent.get
                 BaseNote note = (BaseNote) intent.getSerializableExtra(Constants.NOTE_TODO);
 
                 TodoListNoteFragment todoFragment = new TodoListNoteFragment();

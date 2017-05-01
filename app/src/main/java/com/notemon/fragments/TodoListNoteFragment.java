@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.notemon.R;
 import com.notemon.adapters.TodoListAdapter;
 import com.notemon.helpers.Constants;
-import com.notemon.helpers.TodoTaskSerialize;
+import com.notemon.helpers.ContentSerializer;
 import com.notemon.models.BaseNote;
 import com.notemon.models.Status;
 import com.notemon.models.TodoNote;
@@ -58,7 +58,7 @@ public class TodoListNoteFragment extends Fragment {
 
         BaseNote note = (BaseNote) getArguments().getSerializable(Constants.NOTE_TODO);
 
-        TodoNote todoNote = new TodoNote(note.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.deserializeTasks(note.getContent()), note.getContent());
+        TodoNote todoNote = new TodoNote(note.getTitle(), Constants.NOTE_TYPE_TODO, ContentSerializer.deserializeTasks(note.getContent()), note.getContent());
 
         tasks = todoNote.getTasks();
 

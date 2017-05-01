@@ -31,10 +31,11 @@ import com.notemon.R;
 import com.notemon.activities.BasicNote;
 import com.notemon.adapters.NotesRecyclerAdapter;
 import com.notemon.helpers.Constants;
+import com.notemon.helpers.ContentSerializer;
 import com.notemon.helpers.DialogBuilder;
 import com.notemon.helpers.DocumentHelper;
 import com.notemon.models.BaseNote;
-import com.notemon.models.TextNote;
+import com.notemon.models.MediaNote;
 import com.notemon.models.UploadImage;
 import com.notemon.rest.RestMethods;
 import com.notemon.rest.UploadService;
@@ -88,7 +89,7 @@ public class NoteRecyclerFragment extends Fragment {
             public void onResponse(Call<List<BaseNote>> call, Response<List<BaseNote>> response) {
                 switch (response.code()) {
                     case 200:
-                        Toast.makeText(getActivity(), "Success in getting notes from project", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "Success in getting notes from project", Toast.LENGTH_SHORT).show();
                         setUpRecycler(response.body());
                         break;
                 }
@@ -96,6 +97,7 @@ public class NoteRecyclerFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<BaseNote>> call, Throwable t) {
+                Toast.makeText(getActivity(), "Failure in getting notes from project", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -158,7 +160,7 @@ public class NoteRecyclerFragment extends Fragment {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
                     Toast.makeText(getActivity(), result.get(0), Toast.LENGTH_LONG).show();
-                    createTextNote(noteTitle, result.get(0));
+                    createTextNote(noteTitle, result.get(0), Constants.NOTE_TYPE_TEXT);
                 }
             }
             break;
@@ -209,10 +211,12 @@ public class NoteRecyclerFragment extends Fragment {
                         break;
                     case Constants.NOTE_TYPE_TEXT:
                         dialog.dismiss();
-                        dialogNoteContent();
+                        dialogNoteContent(type);
                         break;
                     case Constants.NOTE_TYPE_MEDIA:
-                        dialogPickFile();
+//                        dialogPickFile();
+                        dialogNoteContent(type);
+                        break;
                 }
             }
         })
@@ -277,7 +281,7 @@ public class NoteRecyclerFragment extends Fragment {
         }
     }
 
-    private void dialogNoteContent() {
+    private void dialogNoteContent(final int type) {
         new MaterialDialog.Builder(getActivity())
                 .title("Enter content:")
                 .inputRangeRes(1, 200, R.color.project_red)
@@ -292,19 +296,82 @@ public class NoteRecyclerFragment extends Fragment {
                 }).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-
-                Toast.makeText(getActivity(), noteContent, Toast.LENGTH_SHORT).show();
-                createTextNote(noteTitle, noteContent);
+                switch (type){
+                    case Constants.NOTE_TYPE_TEXT:
+                        createTextNote(noteTitle, noteContent, type);
+                        break;
+                    case Constants.NOTE_TYPE_MEDIA:
+                        createMediaUrl(noteTitle, noteContent);
+                }
             }
         })
                 .show();
     }
 
-    private void createTextNote(String noteTitle, String content) {
-        Toast.makeText(getActivity(), "NoteTitle: " + noteTitle + "; Content: " + content, Toast.LENGTH_SHORT).show();
-        TextNote textNote = new TextNote(noteTitle, Constants.NOTE_TYPE_TEXT, content);
-        BaseNote baseNote = new BaseNote(textNote.getTitle(), Constants.NOTE_TYPE_TEXT, content);
-        baseNote.setContentType(Constants.NOTE_TYPE_TEXT);
+    private String mediaUrl = "";
+    private void createMediaUrl(final String noteTitle, final String noteContent) {
+        new MaterialDialog.Builder(getActivity())
+                .title("Enter url:")
+                .inputRangeRes(1, 200, R.color.project_red)
+                .alwaysCallInputCallback()
+                .input("Media URL:", null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        mediaUrl = input.toString();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        MediaNote mediaNote = new MediaNote(noteTitle, Constants.NOTE_TYPE_MEDIA, noteContent, mediaUrl);
+                        BaseNote baseNote = new BaseNote(noteTitle, Constants.NOTE_TYPE_MEDIA, ContentSerializer.serializeMedia(noteContent, mediaUrl));
+//                        createTextNote(baseNote.getTitle(), baseNote.getContent(), Constants.NOTE_TYPE_MEDIA);
+                        createMediaNote(baseNote, mediaNote);
+                    }
+                })
+                .show();
+
+
+    }
+
+    private void createMediaNote(BaseNote baseNote, MediaNote mediaNote) {
+        Call<String> call = RestMethods.createNoteToProject(getActivity(), projectId, baseNote);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d(GifHeaderParser.TAG, response.raw().toString());
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(getActivity(), "Success in creating note into project", Toast.LENGTH_SHORT).show();
+                        getNotesForProject();
+                        break;
+
+                    case 401:
+                        Toast.makeText(getActivity(), "401 in creating note into project", Toast.LENGTH_SHORT).show();
+                        Log.d(GifHeaderParser.TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(GifHeaderParser.TAG, t.toString());
+                Toast.makeText(getActivity(), "Failure with adding note to project!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Intent intent = new Intent(getActivity(), BasicNote.class);
+        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_MEDIA);
+        intent.putExtra(Constants.NOTE_TITLE, noteTitle);
+        intent.putExtra(Constants.NOTE_MEDIA, mediaNote);
+//        intent.putExtra(Constants.NOTE_TEXT_CONTENT, mediaNote.getContent());
+        startActivity(intent);
+
+    }
+
+    private void createTextNote(String noteTitle, String content, int noteType) {
+        BaseNote baseNote = new BaseNote(noteTitle, noteType, content);
+        baseNote.setContentType(noteType);
 
         Call<String> call = RestMethods.createNoteToProject(getActivity(), projectId, baseNote);
 

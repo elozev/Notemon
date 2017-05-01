@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.notemon.R;
 import com.notemon.activities.BasicNote;
 import com.notemon.helpers.Constants;
-import com.notemon.helpers.TodoTaskSerialize;
+import com.notemon.helpers.ContentSerializer;
 import com.notemon.models.BaseNote;
 import com.notemon.models.MediaNote;
 import com.notemon.models.TextNote;
@@ -66,7 +66,10 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 BaseNote baseNote = notes.get(position);
                 TextNoteHolder textNoteHolder = (TextNoteHolder) holder;
 
-                TextNote textNote = new TextNote(baseNote.getTitle(), baseNote.getContentType(), baseNote.getContent());
+                final TextNote textNote = new TextNote(baseNote.getTitle(), baseNote.getContentType(), baseNote.getContent());
+                textNote.setId(baseNote.getId());
+                textNote.setReminder(baseNote.getReminder());
+                textNote.setCreatedAt(baseNote.getCreatedAt());
 
                 textNoteHolder.title.setText(textNote.getTitle());
                 textNoteHolder.content.setText(textNote.getContent());
@@ -77,25 +80,45 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                         intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
                         intent.putExtra(Constants.NOTE_TITLE, notes.get(position).getTitle());
                         intent.putExtra(Constants.NOTE_TEXT_CONTENT, notes.get(position).getContent());
+                        intent.putExtra(Constants.NOTE_TEXT, textNote);
                         context.startActivity(intent);
                     }
                 });
                 break;
             case 1:
+//TODO: // FIXME: 01.05.17
+                BaseNote baseNote1 = notes.get(position);
                 MediaNoteHolder mediaNoteHolder = (MediaNoteHolder) holder;
-                MediaNote mediaNote = (MediaNote) notes.get(position);
+
+                ContentSerializer.MediaShort mediaShort = ContentSerializer.deserializeMedia(baseNote1.getContent());
+                final MediaNote mediaNote = new MediaNote(baseNote1.getTitle(), baseNote1.getContentType(), mediaShort.getContent(), mediaShort.getMediaUrl());
 
                 mediaNoteHolder.title.setText(mediaNote.getTitle());
                 mediaNoteHolder.content.setText(mediaNote.getContent());
 
                 Picasso.with(context).load(mediaNote.getMediaUrl()).into(mediaNoteHolder.imageView);
 
+                mediaNoteHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, BasicNote.class);
+                        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_MEDIA);
+                        intent.putExtra(Constants.NOTE_TITLE, notes.get(position).getTitle());
+                        intent.putExtra(Constants.NOTE_TEXT_CONTENT, notes.get(position).getContent());
+                        intent.putExtra(Constants.NOTE_MEDIA, mediaNote);
+                        context.startActivity(intent);
+                    }
+                });
+
                 break;
             case 2:
                 BaseNote baseNote2 = notes.get(position);
                 TodoNoteHolder todoNoteHolder = (TodoNoteHolder) holder;
 
-                TodoNote todoNote = new TodoNote(baseNote2.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.deserializeTasks(baseNote2.getContent()), baseNote2.getContent());
+                TodoNote todoNote = new TodoNote(baseNote2.getTitle(), Constants.NOTE_TYPE_TODO, ContentSerializer.deserializeTasks(baseNote2.getContent()), baseNote2.getContent());
+                todoNote.setId(baseNote2.getId());
+                todoNote.setReminder(baseNote2.getReminder());
+                todoNote.setCreatedAt(baseNote2.getCreatedAt());
 
                 todoNoteHolder.title.setText(todoNote.getTitle());
 
@@ -149,6 +172,9 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     class MediaNoteHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.noteMediaRecyclerLinearLayout)
+        LinearLayout layout;
 
         @BindView(R.id.mediaTitleRecycler)
         TextView title;
