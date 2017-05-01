@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.notemon.models.FirebaseToken;
+import com.notemon.rest.RestMethods;
 
 import static android.content.ContentValues.TAG;
 
@@ -23,5 +25,10 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
 
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
+
+        FirebaseToken firebaseToken = new FirebaseToken();
+        firebaseToken.setDeviceToken(token);
+
+        RestMethods.addTokenToUser(this, firebaseToken);
     }
 }

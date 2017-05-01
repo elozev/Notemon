@@ -17,17 +17,25 @@ import com.notemon.fragments.TodoListNoteFragment;
 import com.notemon.helpers.Constants;
 import com.notemon.helpers.DialogBuilder;
 import com.notemon.models.BaseNote;
+import com.notemon.models.Reminder;
+import com.notemon.rest.RestMethods;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class BasicNote extends AppCompatActivity {
+public class BasicNote extends AppCompatActivity implements com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     String title;
     String content;
+
+    Long noteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,10 @@ public class BasicNote extends AppCompatActivity {
 
         switch (intent.getStringExtra(Constants.NOTE_TYPE)) {
             case Constants.NOTE_TEXT:
+                BaseNote noteText = (BaseNote) intent.getSerializableExtra(Constants.NOTE_TEXT);
+                if (noteText != null)
+                    noteId = noteText.getId();
+
                 title = intent.getStringExtra(Constants.NOTE_TITLE);
                 content = intent.getStringExtra(Constants.NOTE_TEXT_CONTENT);
 
@@ -63,7 +75,9 @@ public class BasicNote extends AppCompatActivity {
                         .commit();
                 break;
             case Constants.NOTE_MEDIA:
-
+                BaseNote noteMedia = (BaseNote) intent.getSerializableExtra(Constants.NOTE_MEDIA);
+                if (noteMedia != null)
+                    noteId = noteMedia.getId();
                 MediaNoteFragment mediaNoteFragment = new MediaNoteFragment();
                 Bundle args = new Bundle();
                 args.putSerializable(Constants.NOTE_MEDIA, intent.getSerializableExtra(Constants.NOTE_MEDIA));
@@ -76,6 +90,8 @@ public class BasicNote extends AppCompatActivity {
                 break;
             case Constants.NOTE_TODO:
                 BaseNote note = (BaseNote) intent.getSerializableExtra(Constants.NOTE_TODO);
+                if (note != null)
+                    noteId = note.getId();
 
                 TodoListNoteFragment todoFragment = new TodoListNoteFragment();
                 Bundle argsTodo = new Bundle();
@@ -109,11 +125,20 @@ public class BasicNote extends AppCompatActivity {
         switch (id) {
             case R.id.action_add_reminder:
                 msg = "reminder";
-                DialogBuilder.addReminder(this);
+
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        BasicNote.this,
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+
                 break;
             case R.id.action_add_to_project:
                 msg = "add to project";
-                DialogBuilder.addToProject(this);
+                DialogBuilder.addToProject(this, noteId);
                 break;
             case R.id.action_share_to_user:
                 msg = "share to user";
@@ -121,7 +146,7 @@ public class BasicNote extends AppCompatActivity {
                 break;
             case R.id.action_delete:
                 msg = "delete";
-                DialogBuilder.promptForDelete(this);
+                DialogBuilder.promptForDelete(this, noteId);
                 break;
         }
 
@@ -130,4 +155,34 @@ public class BasicNote extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private String reminderTime;
+
+    @Override
+    public void onTimeSet(com.wdullaer.materialdatetimepicker.time.TimePickerDialog view, int hourOfDay, int minutes, int seconds) {
+        String hour = hourOfDay < 10 ? "0" + hourOfDay : hourOfDay + "";
+        String minute = minutes < 10 ? "0" + minutes : minutes + "";
+        String second = seconds < 10 ? "0" + seconds : seconds + "";
+        String time = hour + ":" + minute + ":" + second + ".000Z";
+        reminderTime += time;
+        Toast.makeText(this, "reminder: " + reminderTime, Toast.LENGTH_SHORT).show();
+        Reminder r = new Reminder();
+        r.reminder = reminderTime;
+        RestMethods.addReminderToNote(BasicNote.this, noteId, r);
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        String month = (monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : (monthOfYear + 1) + "";
+        String day = dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth + "";
+
+        String date = year + "-" + month + "-" + day + "T";
+        Toast.makeText(this, "date: " + date, Toast.LENGTH_SHORT).show();
+        reminderTime = date;
+        Calendar now = Calendar.getInstance();
+        TimePickerDialog dpd = TimePickerDialog.newInstance(
+                BasicNote.this,
+                true
+        );
+        dpd.show(getFragmentManager(), "Datepickerdialog");
+    }
 }

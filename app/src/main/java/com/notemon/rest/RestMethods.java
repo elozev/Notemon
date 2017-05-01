@@ -11,7 +11,9 @@ import com.notemon.R;
 import com.notemon.helpers.Constants;
 import com.notemon.helpers.DialogBuilder;
 import com.notemon.models.BaseNote;
+import com.notemon.models.FirebaseToken;
 import com.notemon.models.Project;
+import com.notemon.models.Reminder;
 import com.notemon.models.Token;
 import com.notemon.models.User;
 
@@ -168,5 +170,111 @@ public class RestMethods {
     public static Call<List<BaseNote>> getNotesFromProject(Long id) {
         RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
         return routes.getNotesFromProject(id);
+    }
+
+    public static Call<String> deleteNoteWithId(Long id, Context context) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        Call<String> call = routes.deleteNoteWithId(id, token);
+        return call;
+    }
+
+    public static void addNoteToProject(final Context context, Long projectId, Long tokenId) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        Call<String> call = routes.addNoteToProject(projectId, tokenId, token);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(context, "Success in adding to project", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 401:
+                        Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                        break;
+                    case 500:
+                        Toast.makeText(context, "Internal server error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "500: " + response.message() + "\n" + response.body() + "\n" + response.errorBody() + "\n" + response.raw() + "\n" + response.toString());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(TAG, t.toString());
+                Toast.makeText(context, "Failure with creating project!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void addTokenToUser(final Context context, FirebaseToken deviceToken) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        Call<String> call = routes.addTokenToUser(deviceToken, token);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(context, "Success in adding token", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 401:
+                        Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                        break;
+                    case 500:
+                        Toast.makeText(context, "Internal server error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "500: " + response.message() + "\n" + response.body() + "\n" + response.errorBody() + "\n" + response.raw() + "\n" + response.toString());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(TAG, t.toString());
+                Toast.makeText(context, "Failure with creating project!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void addReminderToNote(final Context context, Long noteId, Reminder reminder) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        Call<String> call = routes.addReminderToNote(noteId, token, reminder);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Toast.makeText(context, response.code() + "", Toast.LENGTH_SHORT).show();
+
+                switch (response.code()) {
+                    case 200:
+                        Toast.makeText(context, "Success in adding token", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 401:
+                        Log.d(TAG, "401: " + response.message() + "\n" + response.body() + "\n" + response.errorBody());
+                        break;
+                    case 500:
+                        Toast.makeText(context, "Internal server error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "500: " + response.message() + "\n" + response.body() + "\n" + response.errorBody() + "\n" + response.raw() + "\n" + response.toString());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e(TAG, t.toString());
+                Toast.makeText(context, "Failure with creating project!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

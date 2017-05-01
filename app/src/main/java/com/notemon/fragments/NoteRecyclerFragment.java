@@ -131,7 +131,6 @@ public class NoteRecyclerFragment extends Fragment {
     @OnClick(R.id.addTodoList)
     public void todoListClick() {
         Toast.makeText(getActivity(), "TodoList Note", Toast.LENGTH_SHORT).show();
-        //TODO implement
         DialogBuilder.preTodo(getActivity(), projectId);
     }
 

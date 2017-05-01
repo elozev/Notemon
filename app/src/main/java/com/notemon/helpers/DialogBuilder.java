@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -13,6 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.notemon.R;
 import com.notemon.activities.BasicNote;
 import com.notemon.models.BaseNote;
+import com.notemon.models.Project;
 import com.notemon.models.Status;
 import com.notemon.models.TodoNote;
 import com.notemon.models.TodoTask;
@@ -20,7 +22,9 @@ import com.notemon.rest.RestMethods;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,7 +64,7 @@ public class DialogBuilder {
                 .show();
     }
 
-    public static void promptForDelete(final Context context) {
+    public static void promptForDelete(final Context context, final Long id) {
         new MaterialDialog.Builder(context)
                 .title(R.string.delete_note)
                 .content(R.string.prompt_for_delete)
@@ -69,8 +73,26 @@ public class DialogBuilder {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        //TODO: call the api
-                        Toast.makeText(context, "Deleting this note", Toast.LENGTH_SHORT).show();
+                        Call<String> call = RestMethods.deleteNoteWithId(id, context);
+                        call.enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                switch (response.code()) {
+                                    case 200:
+                                        Toast.makeText(context, "Deletion!", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case 401:
+                                        Toast.makeText(context, "Unauthorized!", Toast.LENGTH_SHORT).show();
+                                        break;
+                                }
+                                Toast.makeText(context, response.code() + "", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Toast.makeText(context, "Failure with deletion!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 })
                 .show();
@@ -95,14 +117,54 @@ public class DialogBuilder {
                 calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    public static void addToProject(Context context) {
+    public static void addToProject(Context context, Long noteId) {
+        getProjects(context, noteId);
+    }
 
-        //TODO: getProjects() then call the dialog
+    private static void materialDialog(final Context context, final Map<Integer, String> projectNames, final Map<Integer, Project> projectMap, final Long noteId) {
+        new MaterialDialog.Builder(context)
+                .title(R.string.add_to_project)
+                .items(projectNames.values())
+                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+//                        Toast.makeText(context, projectMap.get(which).getId() + " " + which, Toast.LENGTH_LONG).show();
+                        RestMethods.addNoteToProject(context, projectMap.get(which).getId(), noteId);
+                        return true;
+                    }
+                })
+                .show();
 
-//        new MaterialDialog.Builder(context)
-//                .title(R.string.add_to_project)
-//                .items()
+    }
 
+    private static void getProjects(final Context context, final Long noteId) {
+        Call<List<Project>> call = RestMethods.getProjects(context);
+        call.enqueue(new Callback<List<Project>>() {
+            @Override
+            public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
+                if (response.body() != null) {
+                    Map<Integer, String> projectNames = new HashMap<>();
+                    Map<Integer, Project> projectMap = new HashMap<>();
+                    int i = 0;
+                    for (Project project : response.body()) {
+                        if (!project.getName().equals("Base Project")) {
+                            projectNames.put(i, project.getName());
+                            projectMap.put(i, project);
+                            Toast.makeText(context, i + ":" + project.getId(), Toast.LENGTH_SHORT).show();
+                            i++;
+                        }
+                    }
+
+                    materialDialog(context, projectNames, projectMap, noteId);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Project>> call, Throwable t) {
+                Toast.makeText(context, t.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     static MaterialDialog dialog;
@@ -197,7 +259,6 @@ public class DialogBuilder {
 
     private static void startTodoNote(final Context context, TodoNote note, Long projectId) {
         BaseNote baseNote = new BaseNote(note.getTitle(), Constants.NOTE_TYPE_TODO, ContentSerializer.serializeTasks(note.getTasks()));
-
 
         Call<String> call = RestMethods.createNoteToProject(context, projectId, baseNote);
         call.enqueue(new Callback<String>() {

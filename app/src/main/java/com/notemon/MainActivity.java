@@ -21,9 +21,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.notemon.fragments.NoteRecyclerFragment;
 import com.notemon.helpers.ColorValues;
 import com.notemon.helpers.Constants;
+import com.notemon.models.FirebaseToken;
 import com.notemon.models.Project;
 import com.notemon.rest.RestMethods;
 
@@ -86,6 +88,15 @@ public class MainActivity extends AppCompatActivity
 
 
         getProjectsForUser();
+        refreshToken();
+    }
+
+    private void refreshToken() {
+        FirebaseToken firebaseToken = new FirebaseToken();
+        String token = FirebaseInstanceId.getInstance().getToken();
+        firebaseToken.setDeviceToken(token);
+        Log.d(TAG, "Firebase Token: " + token);
+        RestMethods.addTokenToUser(this, firebaseToken);
     }
 
     private void getProjectsForUser() {
@@ -93,7 +104,6 @@ public class MainActivity extends AppCompatActivity
         call.enqueue(new Callback<List<Project>>() {
             @Override
             public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
-                Toast.makeText(MainActivity.this, "Getting projects", Toast.LENGTH_SHORT).show();
                 switch (response.code()) {
                     case 200:
                         for (Project p : response.body()) {
