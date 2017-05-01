@@ -16,7 +16,7 @@ import com.notemon.fragments.TextNoteFragment;
 import com.notemon.fragments.TodoListNoteFragment;
 import com.notemon.helpers.Constants;
 import com.notemon.helpers.DialogBuilder;
-import com.notemon.models.TodoNote;
+import com.notemon.models.BaseNote;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,7 +79,7 @@ public class BasicNote extends AppCompatActivity {
                 break;
             case Constants.NOTE_TODO:
 //                title = intent.get
-                TodoNote note = (TodoNote) intent.getSerializableExtra(Constants.NOTE_TODO);
+                BaseNote note = (BaseNote) intent.getSerializableExtra(Constants.NOTE_TODO);
 
                 TodoListNoteFragment todoFragment = new TodoListNoteFragment();
                 Bundle argsTodo = new Bundle();

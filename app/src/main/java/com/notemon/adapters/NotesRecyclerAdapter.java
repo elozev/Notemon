@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.notemon.R;
 import com.notemon.activities.BasicNote;
@@ -74,7 +73,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 textNoteHolder.layout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(context, "Click: " + notes.get(position).getTitle(), Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(context, BasicNote.class);
                         intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TEXT);
                         intent.putExtra(Constants.NOTE_TITLE, notes.get(position).getTitle());
@@ -89,6 +87,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 mediaNoteHolder.title.setText(mediaNote.getTitle());
                 mediaNoteHolder.content.setText(mediaNote.getContent());
+
                 Picasso.with(context).load(mediaNote.getMediaUrl()).into(mediaNoteHolder.imageView);
 
                 break;
@@ -107,6 +106,17 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tasks);
                 todoNoteHolder.listView.setAdapter(adapter);
+
+                todoNoteHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, BasicNote.class);
+                        intent.putExtra(Constants.NOTE_TYPE, Constants.NOTE_TODO);
+                        intent.putExtra(Constants.NOTE_TITLE, notes.get(position).getTitle());
+                        intent.putExtra(Constants.NOTE_TODO, notes.get(position));
+                        context.startActivity(intent);
+                    }
+                });
                 break;
         }
     }
@@ -156,6 +166,10 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     class TodoNoteHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.noteTodoLinearLayout)
+        LinearLayout layout;
+
         @BindView(R.id.todoTitleRecycler)
         TextView title;
 

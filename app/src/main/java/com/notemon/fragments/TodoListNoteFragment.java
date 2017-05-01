@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.notemon.R;
 import com.notemon.adapters.TodoListAdapter;
 import com.notemon.helpers.Constants;
+import com.notemon.helpers.TodoTaskSerialize;
+import com.notemon.models.BaseNote;
 import com.notemon.models.Status;
 import com.notemon.models.TodoNote;
 import com.notemon.models.TodoTask;
@@ -54,8 +56,11 @@ public class TodoListNoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.note_todo, container, false);
         ButterKnife.bind(this, view);
 
-        TodoNote note = (TodoNote) getArguments().getSerializable(Constants.NOTE_TODO);
-        tasks = note.getTasks();
+        BaseNote note = (BaseNote) getArguments().getSerializable(Constants.NOTE_TODO);
+
+        TodoNote todoNote = new TodoNote(note.getTitle(), Constants.NOTE_TYPE_TODO, TodoTaskSerialize.deserializeTasks(note.getContent()), note.getContent());
+
+        tasks = todoNote.getTasks();
 
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
         adapter = new TodoListAdapter(tasks, getActivity());
