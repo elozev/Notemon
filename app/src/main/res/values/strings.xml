@@ -61,4 +61,5 @@
     <string name="task_name">Task name</string>
     <string name="add_next_task">Add next task</string>
     <string name="finish">Finish</string>
+    <string name="notemon">Notemon</string>
 </resources>

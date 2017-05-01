@@ -20,7 +20,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
 
@@ -31,8 +33,10 @@
         </activity>
         <activity
             android:name=".activities.BasicNote"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_basic_note"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -40,7 +44,9 @@
         </activity>
         <activity
             android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -49,13 +55,27 @@
         </activity>
         <activity
             android:name=".activities.RegistrationActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_registration"
             android:parentActivityName=".activities.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.notemon.activities.LoginActivity"/>
         </activity>
+
+        <service android:name=".services.NotificationService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".services.FirebaseIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
