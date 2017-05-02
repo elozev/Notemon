@@ -66,4 +66,7 @@ public interface RestRoutes {
     Call<String> addTokenToUser(@Body FirebaseToken deviceToken, @Header("Authorization") String token);
 
 
+    @GET("users/user/currentUser")
+    Call<User> getCurrentUser(@Header("Authorization") String token);
+
 }

@@ -23,6 +23,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.notemon.fragments.NoteRecyclerFragment;
+import com.notemon.fragments.ProfileFragment;
+import com.notemon.fragments.SettingsFragment;
 import com.notemon.helpers.ColorValues;
 import com.notemon.helpers.Constants;
 import com.notemon.models.FirebaseToken;
@@ -85,7 +87,6 @@ public class MainActivity extends AppCompatActivity
         projectSubMenu = navMenu.addSubMenu(R.string.projects);
         projectSubMenu.add(0, Menu.FIRST, Menu.FIRST, R.string.add_project)
                 .setIcon(R.drawable.ic_add_black_24dp);
-
 
         getProjectsForUser();
         refreshToken();
@@ -194,6 +195,15 @@ public class MainActivity extends AppCompatActivity
             case R.id.navHome:
                 setupFrontFragment(true, baseProject);
                 break;
+            case R.id.navSettings:
+                setUpSettingsFragment();
+                toolbar.setTitle("Settings");
+                break;
+
+            case R.id.navProfile:
+                setUpProfileFragment();
+                toolbar.setTitle("Profile");
+                break;
 //            case R.id.navProject:
 //                setupFrontFragment(false, 1, getResources().getColor(R.color.project_red), getResources().getColor(R.color.project_red_dark));
 //                break;
@@ -204,6 +214,24 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setUpProfileFragment() {
+        FragmentManager manager = getFragmentManager();
+        ProfileFragment fragment = new ProfileFragment();
+
+        manager.beginTransaction()
+                .replace(R.id.mainFrameLayout, fragment)
+                .commit();
+    }
+
+    private void setUpSettingsFragment() {
+        FragmentManager manager = getFragmentManager();
+
+        SettingsFragment fragment = new SettingsFragment();
+        manager.beginTransaction()
+                .replace(R.id.mainFrameLayout, fragment)
+                .commit();
     }
 
     private void setupFrontFragment(boolean isHome, Project project) {

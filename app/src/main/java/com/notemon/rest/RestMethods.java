@@ -279,7 +279,7 @@ public class RestMethods {
         });
     }
 
-    public static void addUserToNote(final Context context, Username username, Long noteId){
+    public static void addUserToNote(final Context context, Username username, Long noteId) {
         RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
         SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
         String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
@@ -309,5 +309,13 @@ public class RestMethods {
                 Toast.makeText(context, "Failure with creating project!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static Call<User> getCurrentUser(Context context) {
+        RestRoutes routes = RestRetriever.getClient().create(RestRoutes.class);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+        String token = Constants.TOKEN_PREFIX + prefs.getString(Constants.TOKEN, "");
+
+        return routes.getCurrentUser(token);
     }
 }
