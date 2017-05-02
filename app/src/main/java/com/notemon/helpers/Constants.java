@@ -36,4 +36,5 @@ public interface Constants {
     String CLIENT_AUTH = "Client-ID " + MY_IMGUR_CLIENT_ID;
     String NOTE_TITLE = "note_title";
     String NOTE_TEXT_CONTENT = "note_content";
+    String NOTIFICATIONS = "notifications";
 }

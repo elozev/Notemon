@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
@@ -13,6 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.notemon.MainActivity;
 import com.notemon.R;
+import com.notemon.helpers.Constants;
 
 import static android.content.ContentValues.TAG;
 
@@ -27,7 +29,13 @@ public class NotificationService extends FirebaseMessagingService {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
 
-        sendNotification(remoteMessage.getNotification().getBody());
+        SharedPreferences prefs = getSharedPreferences(Constants.USER_DETAILS, Context.MODE_PRIVATE);
+
+        boolean switchState = prefs.getBoolean(Constants.NOTIFICATIONS, true);
+
+        if (switchState) {
+            sendNotification(remoteMessage.getNotification().getBody());
+        }
     }
 
     private void sendNotification(String message) {
